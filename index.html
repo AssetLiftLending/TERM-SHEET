@@ -6,6 +6,7 @@
 <title>Asset Lift Lending — Loan Term Sheet</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -142,6 +143,9 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .ab-icon.pdf{background:#ffebee;}
 .ab-icon.xls{background:#e8f5e9;}
 .email-note{background:#f0f3f9;border:1px solid #d0d8e8;border-radius:7px;padding:10px 12px;font-size:12px;color:var(--navy);line-height:1.6;}
+.send-status{margin-top:12px;font-size:12px;line-height:1.5;color:var(--muted);}
+.send-status.error{color:#b83232;}
+.send-status.success{color:#2d7a4f;}
 
 /* PDF PREVIEW MODAL */
 .pdf-modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
@@ -528,11 +532,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 
       <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Download Attachments</div>
       <div class="attach-grid">
-        <button class="attach-btn" onclick="_dl('AssetLift_TermSheet.html',_pdfHtml(buildTermSheetContent(),'Asset Lift Lending - Term Sheet'),'text/html')">
+        <button class="attach-btn" onclick="downloadTermSheetPdf()">
           <div class="ab-icon pdf">&#128196;</div>
           <div><div style="font-size:13px;font-weight:700;">Term Sheet PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Downloads → open file → Save as PDF</div></div>
         </button>
-        <button class="attach-btn" onclick="_dl('AssetLift_Checklist.html',_pdfHtml(buildChecklistContent(),'Asset Lift Lending - Checklist'),'text/html')">
+        <button class="attach-btn" onclick="downloadChecklistPdf()">
           <div class="ab-icon pdf">&#128203;</div>
           <div><div style="font-size:13px;font-weight:700;">Checklist PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Downloads → open file → Save as PDF</div></div>
         </button>
@@ -550,9 +554,10 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
         <strong>How to send:</strong> Click "Open Email Client" below — all 4 files will download automatically and your email app will open with the message pre-filled. Open each <code>.html</code> file, click "Save as PDF", then attach all 4 files to the email before hitting send.
       </div>
 
-      <button class="btn-primary" onclick="openEmailClient()" style="width:100%;justify-content:center;">
-        &#9993;&nbsp; Open Email Client
+      <button class="btn-primary" id="sendEmailBtn" onclick="sendTermsEmail()" style="width:100%;justify-content:center;">
+        &#9993;&nbsp; Send Email With PDFs
       </button>
+      <div id="sendStatus" class="send-status"></div>
     </div>
 
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;">
@@ -946,6 +951,171 @@ function printChecklistPDF(){
   setTimeout(()=>w.print(), 600);
 }
 
+function pdfFileName(prefix){
+  const d = getData();
+  const address = (d.address || 'property').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'property';
+  return `${prefix}-${address}.pdf`;
+}
+
+function createPdfDoc(title){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'letter'});
+  const page = {width:612, height:792, margin:48, y:48};
+
+  function addHeader(){
+    doc.setFillColor(15, 30, 60);
+    doc.rect(0, 0, page.width, 70, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.text('Asset Lift Lending', page.margin, 42);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(title, page.width - page.margin, 42, {align:'right'});
+    page.y = 96;
+  }
+
+  function ensureSpace(heightNeeded){
+    if(page.y + heightNeeded <= page.height - page.margin) return;
+    doc.addPage();
+    addHeader();
+  }
+
+  function section(label){
+    ensureSpace(28);
+    doc.setTextColor(15, 30, 60);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(label.toUpperCase(), page.margin, page.y);
+    page.y += 10;
+    doc.setDrawColor(201, 168, 76);
+    doc.line(page.margin, page.y, page.width - page.margin, page.y);
+    page.y += 18;
+  }
+
+  function kv(label, value){
+    ensureSpace(18);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(107, 101, 96);
+    doc.text(`${label}:`, page.margin, page.y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(26, 20, 16);
+    const wrapped = doc.splitTextToSize(String(value || '—'), 300);
+    doc.text(wrapped, 210, page.y);
+    page.y += Math.max(16, wrapped.length * 12);
+  }
+
+  function paragraph(text){
+    const wrapped = doc.splitTextToSize(String(text || ''), page.width - (page.margin * 2));
+    ensureSpace(wrapped.length * 12 + 8);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(26, 20, 16);
+    doc.text(wrapped, page.margin, page.y);
+    page.y += wrapped.length * 12 + 8;
+  }
+
+  addHeader();
+  return {doc, section, kv, paragraph, ensureSpace};
+}
+
+function buildTermSheetPdfDoc(){
+  const d = getData();
+  const c = calcLoan(d);
+  const dateStr = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'N/A';
+  const closingStr = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+  const pdf = createPdfDoc('Loan Term Sheet');
+
+  pdf.section('Borrower & Property');
+  pdf.kv('Issued', dateStr);
+  pdf.kv('Borrower', d.borrower || '—');
+  pdf.kv('Borrower Email', d.email || '—');
+  pdf.kv('Borrower Phone', d.phone || '—');
+  pdf.kv('Property Address', d.address || '—');
+  pdf.kv('Loan Program', d.program || '—');
+  pdf.kv('Loan Purpose', d.purpose || '—');
+  pdf.kv('Estimated Closing', closingStr);
+
+  pdf.section('Key Terms');
+  pdf.kv('Loan Amount', fmt$(c.loanAmt));
+  pdf.kv('Monthly Payment', fmt$(c.monthly));
+  pdf.kv('Total Fees', fmt$(c.totalFees));
+  pdf.kv('Cash To Close', fmt$(c.cashToClose));
+  pdf.kv('Limiting Factor', c.limitingFactor);
+  pdf.kv('Interest Rate', d.rate ? `${d.rate}% per year` : '—');
+  pdf.kv('Origination Fee', d.orig ? `${d.orig}% (${fmt$(c.origFeeAmt)})` : '—');
+  pdf.kv('Loan Term', `${d.term} months`);
+
+  pdf.section('Project Numbers');
+  pdf.kv('Purchase Price', fmt$(d.pp));
+  pdf.kv('After Repair Value', fmt$(d.arv));
+  pdf.kv('Rehab Budget', fmt$(d.rehab));
+  pdf.kv('Total Project Cost', fmt$(c.tpc));
+  pdf.kv('Max LTV', `${d.ltv}%`);
+  pdf.kv('Max LTC', `${d.ltc}%`);
+  pdf.kv('Purchase Leverage', `${d.plev}%`);
+  pdf.kv('Rehab Leverage', `${d.rlev}%`);
+
+  pdf.section('Cash To Close Breakdown');
+  pdf.kv('Purchase Price', fmt$(d.pp));
+  pdf.kv('Less Purchase Loan', fmt$(c.purchaseLoan));
+  pdf.kv('Less Rehab Loan', fmt$(c.rehabLoan));
+  pdf.kv('Origination Fee', fmt$(c.origFeeAmt));
+  pdf.kv('Underwriting Fee', fmt$(d.uw));
+  pdf.kv('Credit Report Fee', fmt$(d.cr));
+  pdf.kv('Other Closing Costs', fmt$(d.other));
+  pdf.kv('Cash Due At Closing', fmt$(c.cashToClose));
+
+  pdf.section('Notes');
+  pdf.paragraph(document.getElementById('pdfNotes').value || 'This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval.');
+
+  return pdf.doc;
+}
+
+function buildChecklistPdfDoc(){
+  const d = getData();
+  const pdf = createPdfDoc('Document Checklist');
+  const completed = new Set(Array.from(document.querySelectorAll('.checklist-item.done')).map(el => el.id.replace('cli-','')));
+
+  pdf.section('Borrower');
+  pdf.kv('Borrower', d.borrower || '—');
+  pdf.kv('Property', d.address || '—');
+
+  pdf.section('Checklist Items');
+  checklistItems.forEach((item, index) => {
+    pdf.ensureSpace(30);
+    const done = completed.has(item.id) ? 'Complete' : 'Pending';
+    pdf.kv(`${index + 1}. ${item.text}`, `${done} — ${item.sub}`);
+  });
+
+  pdf.section('Note');
+  pdf.paragraph('Please provide all items before your scheduled closing date. Missing documents can delay final underwriting and funding.');
+
+  return pdf.doc;
+}
+
+function downloadTermSheetPdf(){
+  buildTermSheetPdfDoc().save(pdfFileName('AssetLift-TermSheet'));
+}
+
+function downloadChecklistPdf(){
+  buildChecklistPdfDoc().save(pdfFileName('AssetLift-Checklist'));
+}
+
+async function pdfToBase64(doc){
+  const blob = doc.output('blob');
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = String(reader.result || '');
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 function previewPDF(){
   document.getElementById('pdfContent').innerHTML = buildTermSheetContent();
   document.getElementById('pdfPreviewWrap').classList.add('show');
@@ -1165,6 +1335,63 @@ function showEmailBanner(){
 /* ── INIT ──────────────────────────────────────────────────── */
 buildChecklist();
 updateAll();
+
+function setSendStatus(message, kind){
+  const el = document.getElementById('sendStatus');
+  if(!el) return;
+  el.textContent = message || '';
+  el.className = `send-status${kind ? ` ${kind}` : ''}`;
+}
+
+async function sendTermsEmail(){
+  const d = getData();
+  if(!d.email){
+    setSendStatus('Enter the borrower email before sending.', 'error');
+    return;
+  }
+
+  const sendBtn = document.getElementById('sendEmailBtn');
+  if(sendBtn){
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+  }
+  setSendStatus('Generating PDFs and sending email...', '');
+
+  try{
+    const [termSheetBase64, checklistBase64] = await Promise.all([
+      pdfToBase64(buildTermSheetPdfDoc()),
+      pdfToBase64(buildChecklistPdfDoc())
+    ]);
+
+    const response = await fetch('/api/send-termsheet', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        to: d.email,
+        subject: `Asset Lift Lending - Loan Term Sheet${d.address ? `: ${d.address}` : ''}`,
+        text: document.getElementById('emailIntroText').value,
+        attachments: [
+          { filename: pdfFileName('AssetLift-TermSheet'), content: termSheetBase64 },
+          { filename: pdfFileName('AssetLift-Checklist'), content: checklistBase64 }
+        ]
+      })
+    });
+
+    const result = await response.json();
+    if(!response.ok){
+      throw new Error(result.error || 'Email send failed.');
+    }
+
+    setSendStatus(`Email sent to ${d.email}.`, 'success');
+  }catch(error){
+    setSendStatus(error.message || 'Unable to send email.', 'error');
+  }finally{
+    if(sendBtn){
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '&#9993;&nbsp; Send Email With PDFs';
+    }
+  }
+}
 </script>
 </body>
 </html>
