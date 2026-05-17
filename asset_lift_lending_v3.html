@@ -1,140 +1,160 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asset Lift Lending — Loan Term Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --navy:#0f1e3c;--navy-mid:#1a2f56;--gold:#c9a84c;--gold-light:#e8c96a;
-    --bg:#f5f3ee;--surface:#ffffff;--border:#e2ddd4;--border-dark:#c8c2b6;
-    --text:#1a1410;--muted:#6b6560;--success:#2d7a4f;--radius:10px;
-  }
-  body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);}
-  .app-wrap{max-width:820px;margin:0 auto;padding:0 0 40px;}
-  .header{background:var(--navy);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);}
-  .logo{font-family:'Playfair Display',serif;font-size:22px;color:#fff;}
-  .logo span{color:var(--gold);}
-  #datePickerInput{font-size:13px;color:var(--gold);background:transparent;border:none;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;text-align:right;width:140px;padding:0;}
-  #datePickerInput::-webkit-calendar-picker-indicator{filter:invert(1) sepia(1) saturate(2) hue-rotate(10deg);cursor:pointer;}
-  .tabs{display:flex;background:var(--navy);padding:0 28px;gap:0;}
-  .tab-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.55);padding:10px 16px;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
-  .tab-btn:hover{color:rgba(255,255,255,0.85);}
-  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
-  .tab-panel{display:none;padding:24px 28px 0;}
-  .tab-panel.active{display:block;}
-  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
-  .section-header{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:border-color 0.15s;}
-  .section-card.open .section-header{border-bottom-color:var(--border);}
-  .section-check{width:18px;height:18px;border:2px solid var(--border-dark);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;cursor:pointer;}
-  .section-check.checked{background:var(--navy);border-color:var(--navy);}
-  .section-check.checked::after{content:'✓';color:white;font-size:11px;font-weight:700;}
-  .section-title{font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--navy);flex:1;}
-  .section-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
-  .section-card.open .section-chevron{transform:rotate(180deg);}
-  .section-body{padding:18px;display:none;}
-  .section-card.open .section-body{display:block;}
-  .form-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
-  .form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
-  label{font-size:12px;font-weight:500;color:var(--muted);}
-  input[type="text"],input[type="number"],input[type="date"],select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border-dark);border-radius:7px;padding:9px 12px;width:100%;transition:border-color 0.15s;outline:none;-webkit-appearance:none;}
-  input:focus,select:focus,textarea:focus{border-color:var(--navy);}
-  .currency-wrap{position:relative;}
-  .currency-wrap input{padding-left:26px;}
-  .currency-symbol{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;}
-  .pct-wrap{position:relative;}
-  .pct-wrap input{padding-right:26px;}
-  .pct-symbol{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;}
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0f1e3c;--navy-mid:#1a2f56;--gold:#c9a84c;--gold-light:#e8c96a;
+  --bg:#f5f3ee;--surface:#ffffff;--border:#e2ddd4;--border-dark:#c8c2b6;
+  --text:#1a1410;--muted:#6b6560;--success:#2d7a4f;--radius:10px;
+}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);}
+.app-wrap{max-width:840px;margin:0 auto;padding:0 0 60px;}
+.header{background:var(--navy);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);}
+.logo{font-family:'Playfair Display',serif;font-size:22px;color:#fff;}
+.logo span{color:var(--gold);}
+#datePickerInput{font-size:13px;color:var(--gold);background:transparent;border:none;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;text-align:right;width:140px;padding:0;}
+#datePickerInput::-webkit-calendar-picker-indicator{filter:invert(1) sepia(1) saturate(2) hue-rotate(10deg);cursor:pointer;}
+.tabs{display:flex;background:var(--navy);padding:0 28px;gap:0;overflow-x:auto;}
+.tab-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.55);padding:10px 16px;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
+.tab-btn:hover{color:rgba(255,255,255,0.85);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-panel{display:none;padding:24px 28px 0;}
+.tab-panel.active{display:block;}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.section-header{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:border-color 0.15s;}
+.section-card.open .section-header{border-bottom-color:var(--border);}
+.section-check{width:18px;height:18px;border:2px solid var(--border-dark);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;cursor:pointer;}
+.section-check.checked{background:var(--navy);border-color:var(--navy);}
+.section-check.checked::after{content:'✓';color:white;font-size:11px;font-weight:700;}
+.section-title{font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--navy);flex:1;}
+.section-chevron{font-size:14px;color:var(--muted);transition:transform 0.2s;}
+.section-card.open .section-chevron{transform:rotate(180deg);}
+.section-body{padding:18px;display:none;}
+.section-card.open .section-body{display:block;}
+.form-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
+label{font-size:12px;font-weight:500;color:var(--muted);}
+input[type="text"],input[type="number"],input[type="date"],input[type="email"],select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border-dark);border-radius:7px;padding:9px 12px;width:100%;transition:border-color 0.15s;outline:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--navy);}
+.currency-wrap{position:relative;}
+.currency-wrap input{padding-left:26px;}
+.currency-symbol{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;}
+.pct-wrap{position:relative;}
+.pct-wrap input{padding-right:26px;}
+.pct-symbol{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;}
 
-  /* SLIDER + NUMBER INPUT COMBO */
-  .slider-group{margin-bottom:20px;}
-  .slider-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;}
-  .slider-label{font-size:12px;font-weight:500;color:var(--muted);flex:1;}
-  .slider-num-input{
-    width:74px;flex-shrink:0;
-    font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;
-    color:var(--navy);background:var(--bg);
-    border:1.5px solid var(--border-dark);border-radius:7px;
-    padding:4px 22px 4px 8px;text-align:right;outline:none;
-    -webkit-appearance:none;appearance:none;
-    transition:border-color 0.15s;
-  }
-  .slider-num-input:focus{border-color:var(--navy);}
-  .slider-num-wrap{position:relative;flex-shrink:0;}
-  .slider-num-wrap .pct-sym{
-    position:absolute;right:7px;top:50%;transform:translateY(-50%);
-    font-size:12px;color:var(--muted);pointer-events:none;font-weight:600;
-  }
-  .slider-row-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  input[type="range"]{-webkit-appearance:none;width:100%;height:5px;background:var(--border);border-radius:3px;border:none;padding:0;cursor:pointer;}
-  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--navy);cursor:pointer;border:3px solid #fff;box-shadow:0 0 0 1px var(--navy);}
+/* SLIDERS */
+.slider-group{margin-bottom:18px;}
+.slider-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.slider-label{font-size:12px;font-weight:500;color:var(--muted);}
+.slider-val-wrap{display:flex;align-items:center;gap:3px;}
+.slider-num-input{width:52px;font-size:14px;font-weight:700;color:var(--navy);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 6px;text-align:center;outline:none;-webkit-appearance:none;font-family:'DM Sans',sans-serif;}
+.slider-num-input:focus{border-color:var(--navy);}
+.slider-num-input::-webkit-inner-spin-button,.slider-num-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.slider-pct{font-size:13px;font-weight:700;color:var(--navy);}
+.slider-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+input[type="range"]{-webkit-appearance:none;width:100%;height:5px;background:var(--border);border-radius:3px;border:none;padding:0;cursor:pointer;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--navy);cursor:pointer;border:3px solid #fff;box-shadow:0 0 0 1px var(--navy);}
 
-  .toggle-row{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:16px;}
-  .toggle-row:last-child{border-bottom:none;padding-bottom:0;}
-  .toggle-info{flex:1;}
-  .toggle-info strong{font-size:14px;font-weight:600;color:var(--text);display:block;margin-bottom:2px;}
-  .toggle-info span{font-size:12px;color:var(--muted);}
-  .toggle{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;margin-top:2px;}
-  .toggle input{opacity:0;width:0;height:0;}
-  .toggle-slider{position:absolute;inset:0;background:var(--border-dark);border-radius:24px;transition:background 0.2s;}
-  .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
-  .toggle input:checked+.toggle-slider{background:var(--navy);}
-  .toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
-  .checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;user-select:none;}
-  .checklist-item:hover{border-color:var(--navy);background:#f8f6f2;}
-  .checklist-item.done{background:#f0f7f3;border-color:#a8d4bb;}
-  .check-box{width:18px;height:18px;border:2px solid var(--border-dark);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-  .checklist-item.done .check-box{background:var(--success);border-color:var(--success);}
-  .ck{display:none;color:white;font-size:11px;font-weight:700;}
-  .checklist-item.done .check-box .ck{display:block;}
-  .check-text{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;}
-  .check-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-  .checklist-item.done .check-text{color:var(--success);}
-  .checklist-progress{margin-bottom:14px;display:flex;align-items:center;gap:12px;}
-  .progress-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
-  .progress-bar-fill{height:100%;background:var(--success);border-radius:3px;transition:width 0.3s;}
-  .progress-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
-  .pdf-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;}
-  .pdf-field{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0ede8;}
-  .pf-label{font-size:12px;color:var(--muted);}
-  .pf-val{font-size:12px;font-weight:600;color:var(--navy);}
-  .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
-  .metric-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;}
-  .metric-card .mc-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
-  .metric-card .mc-val{font-size:16px;font-weight:700;color:var(--navy);}
-  .cash-close-card{background:var(--navy);border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
-  .cash-close-card .cc-label{font-size:12px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
-  .cash-close-card .cc-val{font-size:26px;font-weight:700;color:#fff;font-family:'Playfair Display',serif;}
-  .cash-close-card .cc-sub{font-size:11px;color:var(--gold);margin-top:3px;}
-  .cash-close-breakdown{background:#f0f3f9;border:1px solid #d0d8e8;border-radius:8px;padding:14px 16px;margin-bottom:16px;}
-  .cc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #dde3ed;font-size:13px;}
-  .cc-row:last-child{border-bottom:none;}
-  .cc-row .cc-r-label{color:var(--muted);}
-  .cc-row.total .cc-r-label{color:var(--navy);font-weight:700;}
-  .cc-row .cc-r-val{font-weight:600;color:var(--text);}
-  .cc-row.negative .cc-r-val{color:var(--success);}
-  .pdf-actions{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
-  .pdf-actions h3{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;}
-  .pdf-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-  .pdf-opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s;}
-  .pdf-opt:hover{border-color:var(--navy);}
-  .pdf-opt input{accent-color:var(--navy);width:15px;height:15px;}
-  .pdf-opt label{font-size:13px;font-weight:500;cursor:pointer;}
-  .pdf-opt.selected{background:#f0f3f9;border-color:var(--navy);}
-  .btn-primary{background:var(--navy);color:white;border:none;border-radius:8px;padding:12px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;}
-  .btn-primary:hover{background:var(--navy-mid);}
-  .btn-secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:8px;padding:11px 22px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
-  .btn-gold{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:12px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;}
-  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
-  .divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
-  .pdf-modal-wrap{min-height:500px;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;padding:20px 0;}
-  .pdf-modal-wrap.show{display:flex;}
-  .pdf-modal{background:white;width:100%;max-width:680px;border-radius:12px;overflow:hidden;}
-  .pdf-modal-header{background:var(--navy);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);}
-  .pdf-modal-header span{color:white;font-weight:600;font-size:15px;}
-  .pdf-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;}
-  .pdf-modal-body{overflow-y:auto;max-height:60vh;}
-  .pdf-modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--bg);}
+/* TOGGLES */
+.toggle-row{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:16px;}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0;}
+.toggle-info{flex:1;}
+.toggle-info strong{font-size:14px;font-weight:600;color:var(--text);display:block;margin-bottom:2px;}
+.toggle-info span{font-size:12px;color:var(--muted);}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer;margin-top:2px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border-dark);border-radius:24px;transition:background 0.2s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle input:checked+.toggle-slider{background:var(--navy);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);}
+
+/* CHECKLIST */
+.checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.checklist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;user-select:none;}
+.checklist-item:hover{border-color:var(--navy);background:#f8f6f2;}
+.checklist-item.done{background:#f0f7f3;border-color:#a8d4bb;}
+.check-box{width:18px;height:18px;border:2px solid var(--border-dark);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.checklist-item.done .check-box{background:var(--success);border-color:var(--success);}
+.ck{display:none;color:white;font-size:11px;font-weight:700;}
+.checklist-item.done .check-box .ck{display:block;}
+.check-text{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;}
+.check-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.checklist-item.done .check-text{color:var(--success);}
+.checklist-progress{margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.progress-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--success);border-radius:3px;transition:width 0.3s;}
+.progress-label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
+
+/* SUMMARY */
+.pdf-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;}
+.pdf-field{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0ede8;}
+.pf-label{font-size:12px;color:var(--muted);}
+.pf-val{font-size:12px;font-weight:600;color:var(--navy);}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.metric-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;}
+.metric-card .mc-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.metric-card .mc-val{font-size:16px;font-weight:700;color:var(--navy);}
+
+/* CASH TO CLOSE */
+.cash-close-card{background:var(--navy);border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.cash-close-card .cc-label{font-size:12px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.cash-close-card .cc-val{font-size:26px;font-weight:700;color:#fff;font-family:'Playfair Display',serif;}
+.cash-close-card .cc-sub{font-size:11px;color:var(--gold);margin-top:3px;}
+.cash-close-breakdown{background:#f0f3f9;border:1px solid #d0d8e8;border-radius:8px;padding:14px 16px;margin-bottom:16px;}
+.cc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #dde3ed;font-size:13px;}
+.cc-row:last-child{border-bottom:none;font-weight:600;color:var(--navy);font-size:14px;padding-top:8px;}
+.cc-row .cc-r-label{color:var(--muted);}
+.cc-row.total .cc-r-label{color:var(--navy);font-weight:700;}
+.cc-row .cc-r-val{font-weight:600;color:var(--text);}
+.cc-row.negative .cc-r-val{color:var(--success);}
+
+/* PDF / EMAIL TAB */
+.pdf-actions{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
+.pdf-actions h3{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;}
+.pdf-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.pdf-opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all 0.15s;}
+.pdf-opt:hover{border-color:var(--navy);}
+.pdf-opt input{accent-color:var(--navy);width:15px;height:15px;}
+.pdf-opt label{font-size:13px;font-weight:500;cursor:pointer;}
+.pdf-opt.selected{background:#f0f3f9;border-color:var(--navy);}
+.btn-primary{background:var(--navy);color:white;border:none;border-radius:8px;padding:12px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary:hover{background:var(--navy-mid);}
+.btn-secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:8px;padding:11px 22px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-gold{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:12px 24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:8px;justify-content:center;}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+/* EMAIL SECTION */
+.email-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
+.email-section h3{font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;}
+.attach-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.attach-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);transition:all 0.15s;width:100%;outline:none;text-align:left;}
+.attach-btn:hover{border-color:var(--navy);background:#f0f3f9;}
+.ab-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ab-icon.pdf{background:#ffebee;}
+.ab-icon.xls{background:#e8f5e9;}
+.email-note{background:#f0f3f9;border:1px solid #d0d8e8;border-radius:7px;padding:10px 12px;font-size:12px;color:var(--navy);line-height:1.6;}
+
+/* PDF PREVIEW MODAL */
+.pdf-modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
+.pdf-modal-wrap.show{display:flex;}
+.pdf-modal{background:white;width:100%;max-width:700px;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.pdf-modal-header{background:var(--navy);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--gold);}
+.pdf-modal-header span{color:white;font-weight:600;font-size:15px;}
+.pdf-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;}
+.pdf-modal-body{overflow-y:auto;max-height:65vh;padding:0;}
+.pdf-modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--bg);}
 </style>
-
+</head>
+<body>
 <div class="app-wrap">
   <div class="header">
     <div class="logo">Asset <span>Lift</span> Lending</div>
@@ -149,15 +169,16 @@
     <button class="tab-btn" onclick="switchTab('summary',this)">Summary</button>
     <button class="tab-btn" onclick="switchTab('closing',this)">Cash to Close</button>
     <button class="tab-btn" onclick="switchTab('checklist',this)">Checklist</button>
-    <button class="tab-btn" onclick="switchTab('pdf',this)">Save as PDF</button>
+    <button class="tab-btn" onclick="switchTab('pdf',this)">Save / Email</button>
   </div>
 
+  <!-- FORM TAB -->
   <div id="tab-form" class="tab-panel active">
 
     <div class="section-card open" id="sec-borrower">
       <div class="section-header" onclick="toggleSection('borrower')">
         <div class="section-check" id="chk-borrower" onclick="event.stopPropagation();toggleCheck('borrower')"></div>
-        <div class="section-title">Borrower & Property</div>
+        <div class="section-title">Borrower &amp; Property</div>
         <div class="section-chevron">▼</div>
       </div>
       <div class="section-body">
@@ -196,6 +217,16 @@
           <div class="form-group">
             <label>Estimated closing date</label>
             <input type="date" id="closingDate" oninput="updateAll()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Borrower email (for sending terms)</label>
+            <input type="email" id="borrowerEmail" placeholder="borrower@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Borrower phone</label>
+            <input type="text" id="borrowerPhone" placeholder="(555) 000-0000" oninput="updateAll()" />
           </div>
         </div>
       </div>
@@ -279,54 +310,50 @@
           </div>
         </div>
         <hr class="divider">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:16px;">Leverage & LTV / LTC Controls</div>
-
-        <div class="slider-row-2" style="margin-bottom:4px;">
-
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;">Leverage &amp; LTV / LTC Controls</div>
+        <div class="slider-row" style="margin-bottom:18px;">
           <div class="slider-group">
-            <div class="slider-top-row">
+            <div class="slider-label-row">
               <span class="slider-label">Max LTV (% of ARV)</span>
-              <div class="slider-num-wrap">
-                <input class="slider-num-input" type="number" id="ltvNum" value="70" min="0" max="100" step="0.5" oninput="syncFromNum('ltv')" />
-                <span class="pct-sym">%</span>
+              <div class="slider-val-wrap">
+                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" value="70" oninput="syncFromInput('ltv',this.value)" />
+                <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="ltvSlider" min="0" max="100" step="0.5" value="70" oninput="syncFromSlider('ltv')" />
+            <input type="range" id="ltvSlider" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv',this.value)" />
           </div>
-
           <div class="slider-group">
-            <div class="slider-top-row">
+            <div class="slider-label-row">
               <span class="slider-label">Max LTC (% of total cost)</span>
-              <div class="slider-num-wrap">
-                <input class="slider-num-input" type="number" id="ltcNum" value="85" min="0" max="100" step="0.5" oninput="syncFromNum('ltc')" />
-                <span class="pct-sym">%</span>
+              <div class="slider-val-wrap">
+                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" value="85" oninput="syncFromInput('ltc',this.value)" />
+                <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="ltcSlider" min="0" max="100" step="0.5" value="85" oninput="syncFromSlider('ltc')" />
+            <input type="range" id="ltcSlider" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc',this.value)" />
           </div>
-
+        </div>
+        <div class="slider-row">
           <div class="slider-group">
-            <div class="slider-top-row">
+            <div class="slider-label-row">
               <span class="slider-label">Purchase leverage</span>
-              <div class="slider-num-wrap">
-                <input class="slider-num-input" type="number" id="purchLevNum" value="90" min="0" max="100" step="0.5" oninput="syncFromNum('purchLev')" />
-                <span class="pct-sym">%</span>
+              <div class="slider-val-wrap">
+                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" value="90" oninput="syncFromInput('purchLev',this.value)" />
+                <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="purchLevSlider" min="0" max="100" step="0.5" value="90" oninput="syncFromSlider('purchLev')" />
+            <input type="range" id="purchLevSlider" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev',this.value)" />
           </div>
-
           <div class="slider-group">
-            <div class="slider-top-row">
+            <div class="slider-label-row">
               <span class="slider-label">Rehab leverage</span>
-              <div class="slider-num-wrap">
-                <input class="slider-num-input" type="number" id="rehabLevNum" value="100" min="0" max="100" step="0.5" oninput="syncFromNum('rehabLev')" />
-                <span class="pct-sym">%</span>
+              <div class="slider-val-wrap">
+                <input class="slider-num-input" type="number" id="rehabLevInput" min="50" max="100" value="100" oninput="syncFromInput('rehabLev',this.value)" />
+                <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="rehabLevSlider" min="0" max="100" step="0.5" value="100" oninput="syncFromSlider('rehabLev')" />
+            <input type="range" id="rehabLevSlider" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev',this.value)" />
           </div>
-
         </div>
       </div>
     </div>
@@ -362,8 +389,9 @@
       </div>
     </div>
 
-  </div>
+  </div><!-- end form tab -->
 
+  <!-- SUMMARY TAB -->
   <div id="tab-summary" class="tab-panel">
     <div class="metric-row">
       <div class="metric-card"><div class="mc-label">Loan Amount</div><div class="mc-val" id="smLoanAmt">—</div></div>
@@ -372,7 +400,7 @@
       <div class="metric-card"><div class="mc-label">Limiting Factor</div><div class="mc-val" id="smLimit" style="font-size:13px;">—</div></div>
     </div>
     <div class="section-card open">
-      <div class="section-header"><div class="section-title">Borrower & Property</div></div>
+      <div class="section-header"><div class="section-title">Borrower &amp; Property</div></div>
       <div class="section-body">
         <div class="pdf-grid">
           <div class="pdf-field"><span class="pf-label">Borrower</span><span class="pf-val" id="sm_borrower">—</span></div>
@@ -384,7 +412,7 @@
       </div>
     </div>
     <div class="section-card open">
-      <div class="section-header"><div class="section-title">Loan Terms & Numbers</div></div>
+      <div class="section-header"><div class="section-title">Loan Terms &amp; Numbers</div></div>
       <div class="section-body">
         <div class="pdf-grid">
           <div class="pdf-field"><span class="pf-label">Purchase Price</span><span class="pf-val" id="sm_pp">—</span></div>
@@ -405,6 +433,7 @@
     </div>
   </div>
 
+  <!-- CASH TO CLOSE TAB -->
   <div id="tab-closing" class="tab-panel">
     <div class="cash-close-card">
       <div>
@@ -434,10 +463,11 @@
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.6;">
       <strong style="color:var(--navy);display:block;margin-bottom:4px;">How this is calculated</strong>
-      Cash to close = Purchase Price + Fees − Loan Amount. The loan is capped by the lowest of: purchase leverage, Max LTV × ARV, and Max LTC × total project cost.
+      Cash to close = Purchase Price + Fees − Loan Amount. The loan amount is capped by the lowest of: (1) purchase leverage × purchase price + rehab leverage × rehab budget, (2) Max LTV × ARV, and (3) Max LTC × total project cost.
     </div>
   </div>
 
+  <!-- CHECKLIST TAB -->
   <div id="tab-checklist" class="tab-panel">
     <div class="section-card open">
       <div class="section-header"><div class="section-title">Loan Document Checklist</div></div>
@@ -451,43 +481,98 @@
     </div>
   </div>
 
+  <!-- SAVE / EMAIL TAB -->
   <div id="tab-pdf" class="tab-panel">
+
+    <!-- PDF OPTIONS -->
     <div class="pdf-actions">
       <h3>PDF Options — What to Include</h3>
       <div class="pdf-options">
-        <div class="pdf-opt selected" id="pdfopt-summary" onclick="togglePdfOpt('summary')"><input type="checkbox" id="pdfIncludeSummary" checked /><label>Loan Summary</label></div>
-        <div class="pdf-opt selected" id="pdfopt-terms" onclick="togglePdfOpt('terms')"><input type="checkbox" id="pdfIncludeTerms" checked /><label>Full Loan Terms</label></div>
-        <div class="pdf-opt selected" id="pdfopt-metrics" onclick="togglePdfOpt('metrics')"><input type="checkbox" id="pdfIncludeMetrics" checked /><label>Key Metrics</label></div>
-        <div class="pdf-opt selected" id="pdfopt-closing" onclick="togglePdfOpt('closing')"><input type="checkbox" id="pdfIncludeClosing" checked /><label>Cash to Close Breakdown</label></div>
-        <div class="pdf-opt selected" id="pdfopt-checklist" onclick="togglePdfOpt('checklist')"><input type="checkbox" id="pdfIncludeChecklist" checked /><label>Document Checklist</label></div>
-        <div class="pdf-opt" id="pdfopt-reserves" onclick="togglePdfOpt('reserves')"><input type="checkbox" id="pdfIncludeReserves" /><label>Reserve Details</label></div>
-        <div class="pdf-opt" id="pdfopt-notes" onclick="togglePdfOpt('notes')"><input type="checkbox" id="pdfIncludeNotes" /><label>Notes Section</label></div>
+        <div class="pdf-opt selected" id="pdfopt-summary" onclick="togglePdfOpt('summary')">
+          <input type="checkbox" id="pdfIncludeSummary" checked /><label>Loan Summary</label>
+        </div>
+        <div class="pdf-opt selected" id="pdfopt-terms" onclick="togglePdfOpt('terms')">
+          <input type="checkbox" id="pdfIncludeTerms" checked /><label>Full Loan Terms</label>
+        </div>
+        <div class="pdf-opt selected" id="pdfopt-metrics" onclick="togglePdfOpt('metrics')">
+          <input type="checkbox" id="pdfIncludeMetrics" checked /><label>Key Metrics</label>
+        </div>
+        <div class="pdf-opt selected" id="pdfopt-closing" onclick="togglePdfOpt('closing')">
+          <input type="checkbox" id="pdfIncludeClosing" checked /><label>Cash to Close Breakdown</label>
+        </div>
+        <div class="pdf-opt" id="pdfopt-reserves" onclick="togglePdfOpt('reserves')">
+          <input type="checkbox" id="pdfIncludeReserves" /><label>Reserve Details</label>
+        </div>
+        <div class="pdf-opt" id="pdfopt-notes" onclick="togglePdfOpt('notes')">
+          <input type="checkbox" id="pdfIncludeNotes" /><label>Notes Section</label>
+        </div>
       </div>
       <div id="notesSection" style="display:none;margin-bottom:14px;">
         <label style="font-size:12px;font-weight:500;color:var(--muted);display:block;margin-bottom:5px;">Additional Notes</label>
-        <textarea id="pdfNotes" rows="3" placeholder="Enter any additional notes..." style="resize:vertical;"></textarea>
+        <textarea id="pdfNotes" rows="3" placeholder="Enter any additional notes for the PDF..." style="resize:vertical;"></textarea>
       </div>
       <div class="btn-row">
-        <button class="btn-primary" onclick="previewPDF()">Preview PDF</button>
-        <button class="btn-gold" onclick="printPDF()">Save as PDF</button>
+        <button class="btn-primary" onclick="previewPDF()">&#128065; Preview PDF</button>
+        <button class="btn-gold" onclick="printTermSheetPDF()">&#11015; Save Term Sheet PDF</button>
       </div>
     </div>
+
+    <!-- EMAIL SECTION -->
+    <div class="email-section">
+      <h3>&#9993; Send Terms as Email</h3>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:500;color:var(--muted);display:block;margin-bottom:5px;">Intro message to borrower (editable)</label>
+        <textarea id="emailIntroText" rows="7" style="resize:vertical;font-size:13px;line-height:1.6;" placeholder="Auto-generated when you fill in the form…"></textarea>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Download Attachments</div>
+      <div class="attach-grid">
+        <button class="attach-btn" onclick="printTermSheetPDF()">
+          <div class="ab-icon pdf">&#128196;</div>
+          <div><div style="font-size:13px;font-weight:700;">Term Sheet PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Full loan terms &amp; cash to close</div></div>
+        </button>
+        <button class="attach-btn" onclick="printChecklistPDF()">
+          <div class="ab-icon pdf">&#128203;</div>
+          <div><div style="font-size:13px;font-weight:700;">Checklist PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Document checklist — separate file</div></div>
+        </button>
+        <button class="attach-btn" onclick="downloadLoanSummaryExcel()">
+          <div class="ab-icon xls">&#128200;</div>
+          <div><div style="font-size:13px;font-weight:700;">Loan Summary (Excel)</div><div style="font-size:11px;color:var(--muted);font-weight:400;">All terms &amp; calculated values</div></div>
+        </button>
+        <button class="attach-btn" onclick="downloadAmortizationExcel()">
+          <div class="ab-icon xls">&#128202;</div>
+          <div><div style="font-size:13px;font-weight:700;">Payment Schedule (Excel)</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Month-by-month interest schedule</div></div>
+        </button>
+      </div>
+
+      <div class="email-note" style="margin-bottom:14px;">
+        <strong>How to send:</strong> Download the files above, then click "Open Email Client" — your email app will open with the intro message pre-filled. Attach the downloaded files before sending.
+      </div>
+
+      <button class="btn-primary" onclick="openEmailClient()" style="width:100%;justify-content:center;">
+        &#9993;&nbsp; Open Email Client
+      </button>
+    </div>
+
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:8px;">PDF Quality Note</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;">Select <strong style="color:var(--navy);">Save as PDF</strong> in your browser's print dialog and enable <strong style="color:var(--navy);">Background graphics</strong> for full color output.</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">When saving as PDF, enable <strong style="color:var(--navy);">Background graphics</strong> in the print dialog for full color output.</div>
     </div>
+
   </div>
 </div>
 
+<!-- PDF PREVIEW MODAL -->
 <div id="pdfPreviewWrap" class="pdf-modal-wrap">
   <div class="pdf-modal">
     <div class="pdf-modal-header">
-      <span>PDF Preview</span>
-      <button class="pdf-close" onclick="closePDF()">×</button>
+      <span>PDF Preview — Term Sheet</span>
+      <button class="pdf-close" onclick="closePDF()">&#215;</button>
     </div>
     <div class="pdf-modal-body"><div id="pdfContent"></div></div>
     <div class="pdf-modal-footer">
-      <button class="btn-primary" onclick="printPDF()" style="flex:1;justify-content:center;">Save as PDF</button>
+      <button class="btn-primary" onclick="printTermSheetPDF()" style="flex:1;justify-content:center;">Save as PDF</button>
       <button class="btn-secondary" onclick="closePDF()">Close</button>
     </div>
   </div>
@@ -496,52 +581,25 @@
 <script>
 document.getElementById('datePickerInput').value = new Date().toISOString().split('T')[0];
 
-const SLIDERS = {
-  ltv:      {slider:'ltvSlider',      num:'ltvNum',      min:0, max:100},
-  ltc:      {slider:'ltcSlider',      num:'ltcNum',      min:0, max:100},
-  purchLev: {slider:'purchLevSlider', num:'purchLevNum', min:0, max:100},
-  rehabLev: {slider:'rehabLevSlider', num:'rehabLevNum', min:0, max:100},
-};
-
-function syncFromSlider(key){
-  const cfg = SLIDERS[key];
-  const v = parseFloat(document.getElementById(cfg.slider).value);
-  document.getElementById(cfg.num).value = v;
-  updateAll();
-}
-
-function syncFromNum(key){
-  const cfg = SLIDERS[key];
-  let v = parseFloat(document.getElementById(cfg.num).value);
-  if(isNaN(v)) return;
-  v = Math.min(cfg.max, Math.max(cfg.min, v));
-  document.getElementById(cfg.slider).value = v;
-  updateAll();
-}
-
-function getSliderVal(key){
-  const v = parseFloat(document.getElementById(SLIDERS[key].num).value);
-  return isNaN(v) ? 0 : v;
-}
-
+/* ── CHECKLIST ─────────────────────────────────────────────── */
 const checklistItems = [
-  {id:'cl1',text:'Credit cards for Appraisal',sub:'Payment for appraisal company'},
-  {id:'cl2',text:'LLC Documents',sub:'Articles of organization, operating agreement'},
-  {id:'cl3',text:'Purchase Contract',sub:'Fully executed purchase & sale agreement'},
-  {id:'cl4',text:'Government-issued ID',sub:"Driver's license or passport"},
-  {id:'cl5',text:'Scope of Work',sub:'Detailed renovation plan & cost breakdown'},
-  {id:'cl6',text:'Recent Experience (REO)',sub:'Prior flip/rental project documentation'},
-  {id:'cl7',text:'SSN Number',sub:'Social security number for credit pull'},
-  {id:'cl8',text:'Bank Statement',sub:'Last 2–3 months of statements'},
-  {id:'cl9',text:'Title Contact',sub:'Title company name and contact info'},
-  {id:'cl10',text:'Insurance Contact',sub:'Insurance agent name and contact info'},
-  {id:'cl11',text:'Entity Operating Agreement',sub:'Current signed operating agreement'}
+  {id:'cl1', text:'Credit Card for Appraisal',        sub:'Payment for appraisal company'},
+  {id:'cl2', text:'LLC Documents',                    sub:'Articles of organization, operating agreement'},
+  {id:'cl3', text:'Purchase Contract',                sub:'Fully executed purchase & sale agreement'},
+  {id:'cl4', text:'Government-issued ID',             sub:"Driver's license or passport"},
+  {id:'cl5', text:'Scope of Work',                    sub:'Detailed renovation plan & cost breakdown'},
+  {id:'cl6', text:'Recent Experience (REO)',           sub:'Prior flip/rental project documentation'},
+  {id:'cl7', text:'Social Security Number',           sub:'SSN for credit pull'},
+  {id:'cl8', text:'Bank Statement',                   sub:'Last 2–3 months of statements'},
+  {id:'cl9', text:'Title Contact',                    sub:'Title company name and contact info'},
+  {id:'cl10',text:'Insurance Contact',                sub:'Insurance agent name and contact info'},
+  {id:'cl11',text:'Entity Operating Agreement',       sub:'Current signed operating agreement'}
 ];
 
 function buildChecklist(){
   document.getElementById('checklistGrid').innerHTML = checklistItems.map(item=>`
     <div class="checklist-item" id="cli-${item.id}" onclick="toggleCLItem('${item.id}')">
-      <div class="check-box"><span class="ck">✓</span></div>
+      <div class="check-box"><span class="ck">&#10003;</span></div>
       <div><div class="check-text">${item.text}</div><div class="check-sub">${item.sub}</div></div>
     </div>`).join('');
   updateCLProgress();
@@ -559,44 +617,72 @@ function updateCLProgress(){
   document.getElementById('clProgressLabel').textContent = done+' / '+total+' complete';
 }
 
-function switchTab(name,btn){
+/* ── TABS ──────────────────────────────────────────────────── */
+function switchTab(name, btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
   updateAll();
+  if(name==='pdf') refreshEmailIntro();
 }
 
+/* ── SECTION CARDS ─────────────────────────────────────────── */
 function toggleSection(id){ document.getElementById('sec-'+id).classList.toggle('open'); }
-function toggleCheck(id){ document.getElementById('chk-'+id).classList.toggle('checked'); }
+function toggleCheck(id)  { document.getElementById('chk-'+id).classList.toggle('checked'); }
 
+/* ── SLIDERS — bidirectional sync ──────────────────────────── */
+const SLIDER_CFG = {
+  ltv:      {slider:'ltvSlider',      input:'ltvInput',      min:50, max:95},
+  ltc:      {slider:'ltcSlider',      input:'ltcInput',      min:50, max:100},
+  purchLev: {slider:'purchLevSlider', input:'purchLevInput', min:50, max:100},
+  rehabLev: {slider:'rehabLevSlider', input:'rehabLevInput', min:50, max:100}
+};
+
+function syncFromSlider(type, val){
+  val = parseInt(val);
+  document.getElementById(SLIDER_CFG[type].input).value = val;
+  updateAll();
+}
+
+function syncFromInput(type, raw){
+  const cfg = SLIDER_CFG[type];
+  let val = parseInt(raw);
+  if(isNaN(val)) return;
+  val = Math.max(cfg.min, Math.min(cfg.max, val));
+  document.getElementById(cfg.slider).value = val;
+  document.getElementById(cfg.input).value  = val;
+  updateAll();
+}
+
+/* ── DATA & CALCULATIONS ───────────────────────────────────── */
 function fmt$(n){
-  if(n===null||n===undefined||isNaN(n)) return '—';
+  if(n===null||n===undefined||n===''||isNaN(n)) return '—';
   return '$'+Math.round(n).toLocaleString('en-US');
 }
-
-function fmtPct(n){ return n%1===0 ? n+'%' : parseFloat(n.toFixed(2))+'%'; }
 
 function getData(){
   return {
     borrower: document.getElementById('borrowerName').value,
-    address: document.getElementById('propAddress').value,
-    program: document.getElementById('loanProgram').value,
-    purpose: document.getElementById('loanPurpose').value,
-    closing: document.getElementById('closingDate').value,
-    pp: parseFloat(document.getElementById('purchasePrice').value)||0,
-    arv: parseFloat(document.getElementById('arv').value)||0,
-    rehab: parseFloat(document.getElementById('rehabBudget').value)||0,
-    rate: parseFloat(document.getElementById('interestRate').value)||0,
-    orig: parseFloat(document.getElementById('origFee').value)||0,
-    term: parseInt(document.getElementById('loanTerm').value)||12,
-    uw: parseFloat(document.getElementById('uwFee').value)||0,
-    cr: parseFloat(document.getElementById('crFee').value)||0,
-    other: parseFloat(document.getElementById('otherCosts').value)||0,
-    ltv: getSliderVal('ltv'),
-    ltc: getSliderVal('ltc'),
-    plev: getSliderVal('purchLev'),
-    rlev: getSliderVal('rehabLev'),
+    address:  document.getElementById('propAddress').value,
+    program:  document.getElementById('loanProgram').value,
+    purpose:  document.getElementById('loanPurpose').value,
+    closing:  document.getElementById('closingDate').value,
+    email:    document.getElementById('borrowerEmail').value,
+    phone:    document.getElementById('borrowerPhone').value,
+    pp:       parseFloat(document.getElementById('purchasePrice').value)||0,
+    arv:      parseFloat(document.getElementById('arv').value)||0,
+    rehab:    parseFloat(document.getElementById('rehabBudget').value)||0,
+    rate:     parseFloat(document.getElementById('interestRate').value)||0,
+    orig:     parseFloat(document.getElementById('origFee').value)||0,
+    term:     parseInt(document.getElementById('loanTerm').value)||12,
+    uw:       parseFloat(document.getElementById('uwFee').value)||0,
+    cr:       parseFloat(document.getElementById('crFee').value)||0,
+    other:    parseFloat(document.getElementById('otherCosts').value)||0,
+    ltv:      parseInt(document.getElementById('ltvSlider').value),
+    ltc:      parseInt(document.getElementById('ltcSlider').value),
+    plev:     parseInt(document.getElementById('purchLevSlider').value),
+    rlev:     parseInt(document.getElementById('rehabLevSlider').value),
     t1: document.getElementById('t1').checked,
     t2: document.getElementById('t2').checked,
     t3: document.getElementById('t3').checked,
@@ -605,111 +691,154 @@ function getData(){
 }
 
 function calcLoan(d){
-  const tpc = d.pp + d.rehab;
-  const purchaseLoanRaw = d.pp*(d.plev/100);
-  const rehabLoanRaw = d.rehab*(d.rlev/100);
-  const leverageLoan = purchaseLoanRaw + rehabLoanRaw;
-  const ltvCap = d.arv*(d.ltv/100);
-  const ltcCap = tpc*(d.ltc/100);
+  const tpc            = d.pp + d.rehab;
+  const purchaseLoanRaw = d.pp   * (d.plev/100);
+  const rehabLoanRaw   = d.rehab * (d.rlev/100);
+  const leverageLoan   = purchaseLoanRaw + rehabLoanRaw;
+  const ltvCap  = d.arv > 0 ? d.arv * (d.ltv/100) : Infinity;
+  const ltcCap  = tpc   > 0 ? tpc   * (d.ltc/100) : Infinity;
   let loanAmt = leverageLoan;
   let limitingFactor = 'Leverage';
   if(d.arv>0 && ltvCap < loanAmt){ loanAmt = ltvCap; limitingFactor = 'LTV cap'; }
-  if(tpc>0 && ltcCap < loanAmt){ loanAmt = ltcCap; limitingFactor = 'LTC cap'; }
+  if(tpc>0  && ltcCap < loanAmt){ loanAmt = ltcCap; limitingFactor = 'LTC cap'; }
   loanAmt = Math.max(0, loanAmt);
   const purchaseLoan = Math.min(purchaseLoanRaw, loanAmt);
-  const rehabLoan = Math.max(0, loanAmt - purchaseLoan);
-  const monthly = loanAmt>0 && d.rate>0 ? (loanAmt*(d.rate/100))/12 : 0;
-  const origFeeAmt = loanAmt*(d.orig/100);
-  const totalFees = origFeeAmt + d.uw + d.cr + d.other;
-  const cashToClose = (d.pp - purchaseLoan) + totalFees;
-  return {loanAmt,purchaseLoan,rehabLoan,monthly,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,ltvCap,ltcCap};
+  const rehabLoan    = Math.max(0, loanAmt - purchaseLoan);
+  const monthly      = loanAmt>0 && d.rate>0 ? (loanAmt*(d.rate/100))/12 : 0;
+  const origFeeAmt   = loanAmt*(d.orig/100);
+  const totalFees    = origFeeAmt + d.uw + d.cr + d.other;
+  const cashToClose  = (d.pp - purchaseLoan) + totalFees;
+  return {loanAmt,purchaseLoan,rehabLoan,monthly,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0};
 }
 
+/* ── UPDATE ALL DISPLAYS ───────────────────────────────────── */
 function updateAll(){
-  const d=getData(); const c=calcLoan(d);
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v||'—';};
-  set('smLoanAmt',fmt$(c.loanAmt)); set('smMonthly',fmt$(c.monthly));
-  set('smFees',fmt$(c.totalFees)); set('smLimit',c.limitingFactor);
-  set('sm_borrower',d.borrower); set('sm_program',d.program);
-  set('sm_address',d.address); set('sm_purpose',d.purpose);
-  set('sm_closing',d.closing?new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'');
-  set('sm_pp',fmt$(d.pp)); set('sm_arv',fmt$(d.arv));
-  set('sm_rehab',fmt$(d.rehab)); set('sm_tpc',fmt$(c.tpc));
-  set('sm_rate',d.rate?fmtPct(d.rate)+' / yr':''); set('sm_orig',d.orig?fmtPct(d.orig):'');
-  set('sm_term',d.term?d.term+' months':'');
-  set('sm_ltv',fmtPct(d.ltv)); set('sm_ltc',fmtPct(d.ltc));
-  set('sm_plev',fmtPct(d.plev)); set('sm_rlev',fmtPct(d.rlev));
-  set('sm_uw',fmt$(d.uw)); set('sm_cr',fmt$(d.cr));
-  set('cc_total',fmt$(c.cashToClose));
-  document.getElementById('cc_sub').textContent = c.cashToClose<=0?'No cash required at closing':'Required at closing table';
-  set('cc_constraint',c.limitingFactor);
-  set('ccr_pp',fmt$(d.pp)); set('ccr_rehab',fmt$(d.rehab));
-  set('ccr_tpc',fmt$(c.tpc));
-  set('ccr_loan_pp','− '+fmt$(c.purchaseLoan));
-  set('ccr_loan_rh','− '+fmt$(c.rehabLoan));
-  set('ccr_orig',fmt$(c.origFeeAmt));
-  set('ccr_uw',fmt$(d.uw)); set('ccr_cr',fmt$(d.cr)); set('ccr_other',fmt$(d.other));
-  set('ccr_final',fmt$(c.cashToClose));
+  const d = getData();
+  const c = calcLoan(d);
+  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = (v||v===0) ? v : '—'; };
+
+  // summary metrics
+  document.getElementById('smLoanAmt').textContent = fmt$(c.loanAmt);
+  document.getElementById('smMonthly').textContent = fmt$(c.monthly);
+  document.getElementById('smFees').textContent    = fmt$(c.totalFees);
+  document.getElementById('smLimit').textContent   = c.limitingFactor;
+
+  // summary tab fields
+  set('sm_borrower', d.borrower); set('sm_program', d.program);
+  set('sm_address',  d.address);  set('sm_purpose', d.purpose);
+  set('sm_closing',  d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '');
+  set('sm_pp',   fmt$(d.pp));   set('sm_arv',  fmt$(d.arv));
+  set('sm_rehab',fmt$(d.rehab));set('sm_tpc',  fmt$(c.tpc));
+  set('sm_rate', d.rate ? d.rate+'% / yr' : '');
+  set('sm_orig', d.orig ? d.orig+'%' : '');
+  set('sm_term', d.term ? d.term+' months' : '');
+  set('sm_ltv',  d.ltv+'%'); set('sm_ltc', d.ltc+'%');
+  set('sm_plev', d.plev+'%');set('sm_rlev',d.rlev+'%');
+  set('sm_uw', fmt$(d.uw)); set('sm_cr', fmt$(d.cr));
+
+  // cash to close tab
+  set('cc_total', fmt$(c.cashToClose));
+  document.getElementById('cc_sub').textContent = c.cashToClose<=0 ? 'No cash required at closing' : 'Required at closing table';
+  set('cc_constraint', c.limitingFactor);
+  set('ccr_pp',fmt$(d.pp)); set('ccr_rehab',fmt$(d.rehab)); set('ccr_tpc',fmt$(c.tpc));
+  set('ccr_loan_pp', '− '+fmt$(c.purchaseLoan));
+  set('ccr_loan_rh', '− '+fmt$(c.rehabLoan));
+  set('ccr_orig',  fmt$(c.origFeeAmt));
+  set('ccr_uw',    fmt$(d.uw));
+  set('ccr_cr',    fmt$(d.cr));
+  set('ccr_other', fmt$(d.other));
+  set('ccr_final', fmt$(c.cashToClose));
 }
 
+/* ── PDF OPTIONS ───────────────────────────────────────────── */
 function togglePdfOpt(name){
-  const el=document.getElementById('pdfopt-'+name);
-  const chk=document.getElementById('pdfInclude'+name.charAt(0).toUpperCase()+name.slice(1));
-  el.classList.toggle('selected'); chk.checked=!chk.checked;
-  if(name==='notes') document.getElementById('notesSection').style.display=chk.checked?'block':'none';
+  const el  = document.getElementById('pdfopt-'+name);
+  const chk = document.getElementById('pdfInclude'+name.charAt(0).toUpperCase()+name.slice(1));
+  el.classList.toggle('selected');
+  chk.checked = !chk.checked;
+  if(name==='notes') document.getElementById('notesSection').style.display = chk.checked?'block':'none';
 }
 
-function buildPDFContent(){
+/* ── BUILD TERM SHEET PDF CONTENT ──────────────────────────── */
+function buildTermSheetContent(){
   const d=getData(); const c=calcLoan(d);
-  const inc=name=>document.getElementById('pdfInclude'+name.charAt(0).toUpperCase()+name.slice(1)).checked;
-  const dateStr=d.date?new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'N/A';
-  const closingStr=d.closing?new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'—';
-  const f=fmt$; const fp=fmtPct;
-  let h=`<div style="font-family:'DM Sans',sans-serif;color:#1a1410;padding:36px 44px;">`;
-  h+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #0f1e3c;">
+  const incSummary  = document.getElementById('pdfIncludeSummary').checked;
+  const incTerms    = document.getElementById('pdfIncludeTerms').checked;
+  const incReserves = document.getElementById('pdfIncludeReserves').checked;
+  const incMetrics  = document.getElementById('pdfIncludeMetrics').checked;
+  const incClosing  = document.getElementById('pdfIncludeClosing').checked;
+  const incNotes    = document.getElementById('pdfIncludeNotes').checked;
+  const notes       = document.getElementById('pdfNotes').value;
+  const dateStr     = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'N/A';
+  const closingStr  = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+  const f = fmt$;
+
+  let h = `<div style="font-family:'DM Sans',sans-serif;color:#1a1410;padding:36px 44px;">`;
+  h += `<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #0f1e3c;">
     <div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#0f1e3c;">Asset <span style="color:#c9a84c;">Lift</span> Lending</div>
     <div style="font-size:11px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:0.06em;">Private Real Estate Lending</div></div>
     <div style="text-align:right;"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0f1e3c;">Loan Term Sheet</div>
     <div style="font-size:12px;color:#888;margin-top:3px;">Issued: ${dateStr}</div>
     <div style="font-size:11px;color:#c9a84c;font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;">Confidential</div></div>
   </div>`;
-  if(inc('summary')){
-    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Borrower & Property</div>
+
+  if(incSummary){
+    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Borrower &amp; Property</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Borrower</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.borrower||'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Program</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.program||'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Property Address</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.address||'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Purpose</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.purpose||'—'}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Est. Closing</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${closingStr}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Estimated Closing</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${closingStr}</span></div>
     </div></div>`;
   }
-  if(inc('metrics')){
+
+  if(incMetrics){
     h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Loan Amount</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:3px;">${f(c.loanAmt)}</div><div style="font-size:10px;color:#c9a84c;margin-top:2px;">${c.limitingFactor}</div></div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Monthly Payment</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:3px;">${f(c.monthly)}</div><div style="font-size:10px;color:#c9a84c;margin-top:2px;">Interest only</div></div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Total Fees</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:3px;">${f(c.totalFees)}</div><div style="font-size:10px;color:#c9a84c;margin-top:2px;">At closing</div></div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Cash to Close</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:3px;">${f(c.cashToClose)}</div><div style="font-size:10px;color:#c9a84c;margin-top:2px;">Required</div></div>
+      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Loan Amount</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.loanAmt)}</div>
+        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">${c.limitingFactor}</div>
+      </div>
+      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Monthly Payment</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.monthly)}</div>
+        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Interest only</div>
+      </div>
+      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Total Fees</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.totalFees)}</div>
+        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">At closing</div>
+      </div>
+      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Cash to Close</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.cashToClose)}</div>
+        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Required</div>
+      </div>
     </div>`;
   }
-  if(inc('terms')){
-    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms & Numbers</div>
+
+  if(incTerms){
+    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms &amp; Numbers</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">ARV</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">After Repair Value (ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Budget</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.rehab)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Project Cost</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.tpc)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?fp(d.rate)+' / year':'—'}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?fp(d.orig)+' ('+f(c.origFeeAmt)+')':'—'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?d.rate+'% / year':'—'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${fp(d.ltv)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${fp(d.ltc)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${fp(d.plev)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${fp(d.rlev)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">UW Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.other)}</span></div>
     </div></div>`;
   }
-  if(inc('closing')){
+
+  if(incClosing){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Cash to Close Breakdown</div>
     <div style="background:#f8f8f5;border:1px solid #e0dbd2;border-radius:6px;padding:12px 14px;">
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:500;">${f(d.pp)}</span></div>
@@ -718,51 +847,265 @@ function buildPDFContent(){
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:500;">${f(d.uw)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:500;">${f(d.cr)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #c8c2b6;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:500;">${f(d.other)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 0 2px;"><span style="font-size:13px;font-weight:700;color:#0f1e3c;">Cash Due at Closing</span><span style="font-size:15px;font-weight:700;color:#0f1e3c;">${f(c.cashToClose)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0 4px;"><span style="font-size:13px;font-weight:700;color:#0f1e3c;">Cash Due at Closing</span><span style="font-size:15px;font-weight:700;color:#0f1e3c;">${f(c.cashToClose)}</span></div>
     </div></div>`;
   }
-  if(inc('reserves')){
+
+  if(incReserves){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Reserve Options</div>
-    <div style="display:flex;flex-direction:column;gap:5px;">
-      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0ede8;"><div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t1?'#2d7a4f':'#c8c2b6'};background:${d.t1?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t1?'✓':''}</div><span style="font-size:12px;font-weight:600;color:#1a1410;">Finance Interest Reserves</span></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0ede8;"><div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t2?'#2d7a4f':'#c8c2b6'};background:${d.t2?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t2?'✓':''}</div><span style="font-size:12px;font-weight:600;color:#1a1410;">Require Bank Account Reserves</span></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;"><div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t3?'#2d7a4f':'#c8c2b6'};background:${d.t3?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t3?'✓':''}</div><span style="font-size:12px;font-weight:600;color:#1a1410;">Collect Reserves at Closing</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ede8;">
+        <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t1?'#2d7a4f':'#c8c2b6'};background:${d.t1?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t1?'✓':''}</div>
+        <span style="font-size:12px;font-weight:600;color:#1a1410;">Finance Interest Reserves</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ede8;">
+        <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t2?'#2d7a4f':'#c8c2b6'};background:${d.t2?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t2?'✓':''}</div>
+        <span style="font-size:12px;font-weight:600;color:#1a1410;">Require Bank Account Reserves</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+        <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t3?'#2d7a4f':'#c8c2b6'};background:${d.t3?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t3?'✓':''}</div>
+        <span style="font-size:12px;font-weight:600;color:#1a1410;">Collect Reserves at Closing</span>
+      </div>
     </div></div>`;
   }
-  if(inc('checklist')){
-    const doneIds=Array.from(document.querySelectorAll('.checklist-item.done')).map(el=>el.id.replace('cli-',''));
-    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Document Checklist (${doneIds.length} / ${checklistItems.length} Complete)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-      ${checklistItems.map(item=>{const done=doneIds.includes(item.id);return`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid ${done?'#a8d4bb':'#e2ddd4'};border-radius:6px;background:${done?'#f0f7f3':'#fafaf8'};"><div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${done?'#2d7a4f':'#c8c2b6'};background:${done?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${done?'✓':''}</div><span style="font-size:12px;font-weight:${done?600:500};color:${done?'#2d7a4f':'#1a1410'};">${item.text}</span></div>`;}).join('')}
-    </div></div>`;
-  }
-  if(inc('notes')&&document.getElementById('pdfNotes').value){
+
+  if(incNotes && notes){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Notes</div>
-    <div style="font-size:13px;color:#444;line-height:1.65;padding:10px 12px;background:#fafaf8;border:1px solid #e2ddd4;border-radius:6px;">${document.getElementById('pdfNotes').value}</div></div>`;
+    <div style="font-size:13px;color:#444;line-height:1.65;padding:10px 12px;background:#fafaf8;border:1px solid #e2ddd4;border-radius:6px;">${notes}</div></div>`;
   }
+
   h+=`<div style="margin-top:28px;padding-top:12px;border-top:1px solid #e2ddd4;display:flex;justify-content:space-between;align-items:center;">
-    <div style="font-size:10px;color:#aaa;max-width:60%;line-height:1.5;">This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms subject to underwriting approval.</div>
+    <div style="font-size:10px;color:#aaa;max-width:60%;line-height:1.5;">This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval and may change.</div>
     <div style="font-size:10px;color:#aaa;">Asset Lift Lending · Confidential</div>
-  </div></div>`;
+  </div>`;
+  h+='</div>';
   return h;
 }
 
-function previewPDF(){
-  document.getElementById('pdfContent').innerHTML=buildPDFContent();
-  document.getElementById('pdfPreviewWrap').classList.add('show');
-}
-function closePDF(){ document.getElementById('pdfPreviewWrap').classList.remove('show'); }
-function printPDF(){
-  const content=buildPDFContent();
-  const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>Asset Lift Lending - Term Sheet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}body{font-family:'DM Sans',sans-serif;background:white;}@media print{@page{margin:0.6in;size:letter;}}</style>
-  </head><body>${content}</body></html>`);
-  w.document.close(); w.focus();
-  setTimeout(()=>w.print(),600);
+/* ── BUILD CHECKLIST PDF CONTENT ───────────────────────────── */
+function buildChecklistContent(){
+  const d = getData();
+  const doneIds = Array.from(document.querySelectorAll('.checklist-item.done')).map(el=>el.id.replace('cli-',''));
+  const dateStr = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'N/A';
+  const pct = Math.round(doneIds.length/checklistItems.length*100);
+
+  let h = `<div style="font-family:'DM Sans',sans-serif;color:#1a1410;padding:36px 44px;">`;
+  h += `<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #0f1e3c;">
+    <div><div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#0f1e3c;">Asset <span style="color:#c9a84c;">Lift</span> Lending</div>
+    <div style="font-size:11px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:0.06em;">Private Real Estate Lending</div></div>
+    <div style="text-align:right;"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0f1e3c;">Document Checklist</div>
+    <div style="font-size:12px;color:#888;margin-top:3px;">${d.borrower||'Borrower'} · ${dateStr}</div>
+    <div style="font-size:11px;color:#c9a84c;font-weight:600;margin-top:2px;text-transform:uppercase;">${d.address||''}</div></div>
+  </div>`;
+
+  h += `<div style="margin-bottom:16px;display:flex;align-items:center;gap:14px;">
+    <div style="flex:1;height:8px;background:#e2ddd4;border-radius:4px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;background:#2d7a4f;border-radius:4px;"></div>
+    </div>
+    <span style="font-size:13px;font-weight:700;color:#2d7a4f;white-space:nowrap;">${doneIds.length} / ${checklistItems.length} complete</span>
+  </div>`;
+
+  h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">`;
+  checklistItems.forEach(item=>{
+    const done = doneIds.includes(item.id);
+    h += `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid ${done?'#a8d4bb':'#e2ddd4'};border-radius:8px;background:${done?'#f0f7f3':'#fafaf8'};">
+      <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${done?'#2d7a4f':'#c8c2b6'};background:${done?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;flex-shrink:0;margin-top:1px;">${done?'✓':''}</div>
+      <div>
+        <div style="font-size:12px;font-weight:${done?700:500};color:${done?'#2d7a4f':'#1a1410'};">${item.text}</div>
+        <div style="font-size:10px;color:#888;margin-top:2px;">${item.sub}</div>
+      </div>
+    </div>`;
+  });
+  h += `</div>`;
+
+  h += `<div style="margin-top:28px;padding-top:12px;border-top:1px solid #e2ddd4;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:10px;color:#aaa;">Please provide all items before your scheduled closing date.</div>
+    <div style="font-size:10px;color:#aaa;">Asset Lift Lending · Confidential</div>
+  </div>`;
+  h += '</div>';
+  return h;
 }
 
+/* ── PRINT HELPERS ─────────────────────────────────────────── */
+const PRINT_HEAD = `<!DOCTYPE html><html><head><title>Asset Lift Lending</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}body{font-family:'DM Sans',sans-serif;background:white;}@media print{@page{margin:0.6in;size:letter;}}</style>
+  </head><body>`;
+
+function printTermSheetPDF(){
+  const w = window.open('','_blank');
+  w.document.write(PRINT_HEAD + buildTermSheetContent() + '</body></html>');
+  w.document.close(); w.focus();
+  setTimeout(()=>w.print(), 600);
+}
+
+function printChecklistPDF(){
+  const w = window.open('','_blank');
+  w.document.write(PRINT_HEAD + buildChecklistContent() + '</body></html>');
+  w.document.close(); w.focus();
+  setTimeout(()=>w.print(), 600);
+}
+
+function previewPDF(){
+  document.getElementById('pdfContent').innerHTML = buildTermSheetContent();
+  document.getElementById('pdfPreviewWrap').classList.add('show');
+}
+
+function closePDF(){
+  document.getElementById('pdfPreviewWrap').classList.remove('show');
+}
+
+/* ── EXCEL — LOAN SUMMARY ──────────────────────────────────── */
+function downloadLoanSummaryExcel(){
+  const d = getData(); const c = calcLoan(d);
+  const f = n => (n===null||n===undefined||isNaN(n)) ? '—' : Math.round(n);
+  const dateStr = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '';
+
+  const rows = [
+    ['Asset Lift Lending — Loan Summary'],
+    ['Term Sheet Date', dateStr],
+    [],
+    ['BORROWER & PROPERTY'],
+    ['Borrower Name',        d.borrower  || '—'],
+    ['Property Address',     d.address   || '—'],
+    ['Loan Program',         d.program   || '—'],
+    ['Loan Purpose',         d.purpose   || '—'],
+    ['Estimated Closing',    d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—'],
+    [],
+    ['PROPERTY NUMBERS'],
+    ['Purchase Price',       f(d.pp)],
+    ['After Repair Value',   f(d.arv)],
+    ['Rehab Budget',         f(d.rehab)],
+    ['Total Project Cost',   f(c.tpc)],
+    [],
+    ['LOAN TERMS'],
+    ['Loan Amount',          f(c.loanAmt)],
+    ['Limiting Factor',      c.limitingFactor],
+    ['Interest Rate (%/yr)', d.rate],
+    ['Monthly Payment',      f(c.monthly)],
+    ['Loan Term (months)',   d.term],
+    ['Origination Fee (%)',  d.orig],
+    ['Origination Fee ($)',  f(c.origFeeAmt)],
+    ['Underwriting Fee',     f(d.uw)],
+    ['Credit Report Fee',    f(d.cr)],
+    ['Other Closing Costs',  f(d.other)],
+    ['Total Fees',           f(c.totalFees)],
+    [],
+    ['LEVERAGE CONTROLS'],
+    ['Max LTV (% of ARV)',   d.ltv],
+    ['Max LTC (% of cost)',  d.ltc],
+    ['Purchase Leverage (%)',d.plev],
+    ['Rehab Leverage (%)',   d.rlev],
+    [],
+    ['CASH TO CLOSE'],
+    ['Purchase Price',       f(d.pp)],
+    ['Less: Purchase Loan',  f(c.purchaseLoan)],
+    ['Plus: Total Fees',     f(c.totalFees)],
+    ['Cash Due at Closing',  f(c.cashToClose)],
+    [],
+    ['RESERVE OPTIONS'],
+    ['Finance Interest Reserves',         d.t1?'Yes':'No'],
+    ['Require Reserves in Bank Account',  d.t2?'Yes':'No'],
+    ['Collect Reserves at Closing',       d.t3?'Yes':'No'],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:30},{wch:22}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Loan Summary');
+  XLSX.writeFile(wb, 'AssetLift_LoanSummary.xlsx');
+}
+
+/* ── EXCEL — AMORTIZATION SCHEDULE ────────────────────────── */
+function downloadAmortizationExcel(){
+  const d = getData(); const c = calcLoan(d);
+  const monthly = c.monthly;
+  const startDate = d.closing ? new Date(d.closing+'T00:00:00') : new Date();
+
+  const header = ['Month','Payment Date','Interest Payment','Cumulative Interest','Balance'];
+  const rows = [
+    ['Asset Lift Lending — Interest Payment Schedule'],
+    ['Loan Amount', Math.round(c.loanAmt), '', 'Rate (% / yr)', d.rate],
+    ['Loan Term',   d.term+' months',       '', 'Monthly Payment', Math.round(monthly)],
+    [],
+    header
+  ];
+
+  let cumulative = 0;
+  for(let i=1; i<=d.term; i++){
+    const payDate = new Date(startDate);
+    payDate.setMonth(payDate.getMonth()+i);
+    cumulative += monthly;
+    rows.push([
+      i,
+      payDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+      Math.round(monthly),
+      Math.round(cumulative),
+      Math.round(c.loanAmt)
+    ]);
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:8},{wch:18},{wch:18},{wch:20},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Payment Schedule');
+  XLSX.writeFile(wb, 'AssetLift_PaymentSchedule.xlsx');
+}
+
+/* ── EMAIL INTRO AUTO-GENERATE ─────────────────────────────── */
+function refreshEmailIntro(){
+  const d = getData(); const c = calcLoan(d);
+  const name    = d.borrower || 'there';
+  const addr    = d.address  || 'the property';
+  const program = d.program  || 'loan';
+  const loanAmt = c.loanAmt  > 0 ? fmt$(c.loanAmt)  : '[loan amount]';
+  const monthly = c.monthly  > 0 ? fmt$(c.monthly)   : '[monthly payment]';
+  const fees    = c.totalFees> 0 ? fmt$(c.totalFees) : '[total fees]';
+  const rate    = d.rate     > 0 ? d.rate+'%'        : '[rate]';
+  const term    = d.term         ? d.term+'-month'   : '';
+  const closing = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '[closing date]';
+
+  const intro = `Hi ${name},
+
+Thank you for the opportunity to work with you on your real estate investment. I'm excited to present the following proposed terms for the property at ${addr}.
+
+Loan Overview:
+  Program:         ${program}
+  Loan Amount:     ${loanAmt}
+  Interest Rate:   ${rate} per year (interest only)
+  Monthly Payment: ${monthly}
+  Loan Term:       ${term} months
+  Closing Date:    ${closing}
+  Total Fees:      ${fees}
+
+Attached you will find:
+  • Term Sheet PDF — full loan terms and cash-to-close breakdown
+  • Document Checklist PDF — items needed to proceed
+  • Loan Summary (Excel) — all terms and calculated values
+  • Payment Schedule (Excel) — month-by-month interest schedule
+
+Please review the attached documents and let me know if you have any questions. Once you've had a chance to look everything over, we can schedule a call to go through the details together.
+
+Looking forward to working with you!
+
+Best regards,
+Asset Lift Lending
+info@assetliftlending.com`;
+
+  document.getElementById('emailIntroText').value = intro;
+}
+
+function openEmailClient(){
+  const d       = getData();
+  const toEmail = d.email || '';
+  const subject = encodeURIComponent('Asset Lift Lending — Loan Term Sheet' + (d.address ? ': '+d.address : ''));
+  const body    = encodeURIComponent(document.getElementById('emailIntroText').value);
+  window.location.href = `mailto:${toEmail}?subject=${subject}&body=${body}`;
+}
+
+/* ── INIT ──────────────────────────────────────────────────── */
 buildChecklist();
 updateAll();
 </script>
+</body>
+</html>
