@@ -316,21 +316,21 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Max LTV (% of ARV)</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" value="70" oninput="syncFromInput('ltv',this.value)" />
+                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" step="0.5" value="70" oninput="syncFromInput('ltv',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="ltvSlider" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv',this.value)" />
+            <input type="range" id="ltvSlider" min="50" max="95" step="0.5" value="70" oninput="syncFromSlider('ltv',this.value)" />
           </div>
           <div class="slider-group">
             <div class="slider-label-row">
               <span class="slider-label">Max LTC (% of total cost)</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" value="85" oninput="syncFromInput('ltc',this.value)" />
+                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" step="0.5" value="85" oninput="syncFromInput('ltc',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="ltcSlider" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc',this.value)" />
+            <input type="range" id="ltcSlider" min="50" max="100" step="0.5" value="85" oninput="syncFromSlider('ltc',this.value)" />
           </div>
         </div>
         <div class="slider-row">
@@ -338,11 +338,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Purchase leverage</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" value="90" oninput="syncFromInput('purchLev',this.value)" />
+                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" step="0.5" value="90" oninput="syncFromInput('purchLev',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="purchLevSlider" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev',this.value)" />
+            <input type="range" id="purchLevSlider" min="50" max="100" step="0.5" value="90" oninput="syncFromSlider('purchLev',this.value)" />
           </div>
           <div class="slider-group">
             <div class="slider-label-row">
@@ -352,7 +352,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
                 <span class="slider-pct">%</span>
               </div>
             </div>
-            <input type="range" id="rehabLevSlider" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev',this.value)" />
+            <input type="range" id="rehabLevSlider" min="50" max="100" step="0.5" value="100" oninput="syncFromSlider('rehabLev',this.value)" />
           </div>
         </div>
       </div>
@@ -528,13 +528,13 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 
       <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Download Attachments</div>
       <div class="attach-grid">
-        <button class="attach-btn" onclick="printTermSheetPDF()">
+        <button class="attach-btn" onclick="_dl('AssetLift_TermSheet.html',_pdfHtml(buildTermSheetContent(),'Asset Lift Lending - Term Sheet'),'text/html')">
           <div class="ab-icon pdf">&#128196;</div>
-          <div><div style="font-size:13px;font-weight:700;">Term Sheet PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Full loan terms &amp; cash to close</div></div>
+          <div><div style="font-size:13px;font-weight:700;">Term Sheet PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Downloads → open file → Save as PDF</div></div>
         </button>
-        <button class="attach-btn" onclick="printChecklistPDF()">
+        <button class="attach-btn" onclick="_dl('AssetLift_Checklist.html',_pdfHtml(buildChecklistContent(),'Asset Lift Lending - Checklist'),'text/html')">
           <div class="ab-icon pdf">&#128203;</div>
-          <div><div style="font-size:13px;font-weight:700;">Checklist PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Document checklist — separate file</div></div>
+          <div><div style="font-size:13px;font-weight:700;">Checklist PDF</div><div style="font-size:11px;color:var(--muted);font-weight:400;">Downloads → open file → Save as PDF</div></div>
         </button>
         <button class="attach-btn" onclick="downloadLoanSummaryExcel()">
           <div class="ab-icon xls">&#128200;</div>
@@ -547,7 +547,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
 
       <div class="email-note" style="margin-bottom:14px;">
-        <strong>How to send:</strong> Download the files above, then click "Open Email Client" — your email app will open with the intro message pre-filled. Attach the downloaded files before sending.
+        <strong>How to send:</strong> Click "Open Email Client" below — all 4 files will download automatically and your email app will open with the message pre-filled. Open each <code>.html</code> file, click "Save as PDF", then attach all 4 files to the email before hitting send.
       </div>
 
       <button class="btn-primary" onclick="openEmailClient()" style="width:100%;justify-content:center;">
@@ -640,16 +640,16 @@ const SLIDER_CFG = {
 };
 
 function syncFromSlider(type, val){
-  val = parseInt(val);
+  val = parseFloat(val);
   document.getElementById(SLIDER_CFG[type].input).value = val;
   updateAll();
 }
 
 function syncFromInput(type, raw){
   const cfg = SLIDER_CFG[type];
-  let val = parseInt(raw);
+  let val = parseFloat(raw);
   if(isNaN(val)) return;
-  val = Math.max(cfg.min, Math.min(cfg.max, val));
+  val = Math.max(cfg.min, Math.min(cfg.max, Math.round(val * 2) / 2)); // snap to nearest 0.5
   document.getElementById(cfg.slider).value = val;
   document.getElementById(cfg.input).value  = val;
   updateAll();
@@ -679,10 +679,10 @@ function getData(){
     uw:       parseFloat(document.getElementById('uwFee').value)||0,
     cr:       parseFloat(document.getElementById('crFee').value)||0,
     other:    parseFloat(document.getElementById('otherCosts').value)||0,
-    ltv:      parseInt(document.getElementById('ltvSlider').value),
-    ltc:      parseInt(document.getElementById('ltcSlider').value),
-    plev:     parseInt(document.getElementById('purchLevSlider').value),
-    rlev:     parseInt(document.getElementById('rehabLevSlider').value),
+    ltv:      parseFloat(document.getElementById('ltvSlider').value),
+    ltc:      parseFloat(document.getElementById('ltcSlider').value),
+    plev:     parseFloat(document.getElementById('purchLevSlider').value),
+    rlev:     parseFloat(document.getElementById('rehabLevSlider').value),
     t1: document.getElementById('t1').checked,
     t2: document.getElementById('t2').checked,
     t3: document.getElementById('t3').checked,
@@ -1095,12 +1095,71 @@ info@assetliftlending.com`;
   document.getElementById('emailIntroText').value = intro;
 }
 
+/* download a string as a file */
+function _dl(filename, content, mime){
+  const blob = new Blob([content], {type: mime});
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {href:url, download:filename});
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+}
+
+/* generate printable HTML as a downloadable file */
+function _pdfHtml(content, title){
+  return `<!DOCTYPE html><html><head><title>${title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}body{font-family:'DM Sans',sans-serif;background:white;}
+  @media print{@page{margin:0.6in;size:letter;}}
+  @media screen{body{padding:20px;max-width:750px;margin:0 auto;}}
+  .print-btn{position:fixed;top:12px;right:12px;background:#0f1e3c;color:white;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;z-index:9999;}
+  @media print{.print-btn{display:none;}}</style>
+  </head><body>
+  <button class="print-btn" onclick="window.print()">&#11015; Save as PDF</button>
+  ${content}</body></html>`;
+}
+
 function openEmailClient(){
-  const d       = getData();
-  const toEmail = d.email || '';
-  const subject = encodeURIComponent('Asset Lift Lending — Loan Term Sheet' + (d.address ? ': '+d.address : ''));
-  const body    = encodeURIComponent(document.getElementById('emailIntroText').value);
-  window.location.href = `mailto:${toEmail}?subject=${subject}&body=${body}`;
+  const d = getData();
+
+  /* 1. Download Term Sheet as printable HTML → user saves as PDF */
+  _dl('AssetLift_TermSheet.html',
+      _pdfHtml(buildTermSheetContent(), 'Asset Lift Lending - Term Sheet'),
+      'text/html');
+
+  /* 2. Download Checklist as printable HTML → user saves as PDF */
+  setTimeout(()=>{
+    _dl('AssetLift_Checklist.html',
+        _pdfHtml(buildChecklistContent(), 'Asset Lift Lending - Checklist'),
+        'text/html');
+  }, 400);
+
+  /* 3. Download both Excel files */
+  setTimeout(()=>{ downloadLoanSummaryExcel(); }, 800);
+  setTimeout(()=>{ downloadAmortizationExcel(); }, 1200);
+
+  /* 4. Open email client after downloads start */
+  setTimeout(()=>{
+    const toEmail = d.email || '';
+    const subject = encodeURIComponent('Asset Lift Lending — Loan Term Sheet' + (d.address ? ': '+d.address : ''));
+    const body    = encodeURIComponent(document.getElementById('emailIntroText').value);
+    window.open(`mailto:${toEmail}?subject=${subject}&body=${body}`, '_self');
+  }, 1600);
+
+  /* 5. Show instruction banner */
+  showEmailBanner();
+}
+
+function showEmailBanner(){
+  let banner = document.getElementById('emailBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'emailBanner';
+    banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f1e3c;color:white;padding:14px 22px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:460px;text-align:center;border-bottom:3px solid #c9a84c;';
+    document.body.appendChild(banner);
+  }
+  banner.innerHTML = '&#11015; 4 files downloading to your Downloads folder.<br><span style="color:#c9a84c;font-weight:700;">Open each HTML file and click "Save as PDF", then attach all 4 files to the email that just opened.</span>';
+  banner.style.display = 'block';
+  setTimeout(()=>{ banner.style.display='none'; }, 12000);
 }
 
 /* ── INIT ──────────────────────────────────────────────────── */
