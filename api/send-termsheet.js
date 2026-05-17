@@ -1,14 +1,32 @@
+import nodemailer from 'nodemailer';
+
+function env(name, fallback = '') {
+  const value = process.env[name];
+  return typeof value === 'string' ? value : fallback;
+}
+
+function toBool(value, fallback = false) {
+  if (value === undefined) return fallback;
+  return ['1', 'true', 'yes', 'on'].includes(String(value).toLowerCase());
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.TERMSHEET_FROM_EMAIL || 'Asset Lift Lending <info@assetliftlending.com>';
+  const smtpHost = env('SMTP_HOST');
+  const smtpPort = parseInt(env('SMTP_PORT', '587'), 10);
+  const smtpUser = env('SMTP_USER');
+  const smtpPass = env('SMTP_PASS');
+  const smtpSecure = toBool(process.env.SMTP_SECURE, smtpPort === 465);
+  const fromEmail = env('TERMSHEET_FROM_EMAIL', smtpUser || 'info@assetliftlending.com');
 
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Missing RESEND_API_KEY environment variable.' });
+  if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
+    return res.status(500).json({
+      error: 'Missing SMTP settings. Add SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS environment variables.',
+    });
   }
 
   const { to, subject, text, attachments } = req.body || {};
@@ -18,34 +36,34 @@ export default async function handler(req, res) {
   }
 
   try {
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
       },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [to],
-        subject,
-        text,
-        attachments: attachments.map((file) => ({
-          filename: file.filename,
-          content: file.content
-        }))
-      })
     });
 
-    const result = await resendResponse.json();
+    await transporter.verify();
 
-    if (!resendResponse.ok) {
-      return res.status(502).json({
-        error: result?.message || result?.error || 'Resend request failed.'
-      });
-    }
+    const result = await transporter.sendMail({
+      from: fromEmail,
+      to,
+      subject,
+      text,
+      attachments: attachments.map((file) => ({
+        filename: file.filename,
+        content: file.content,
+        encoding: 'base64',
+      })),
+    });
 
-    return res.status(200).json({ ok: true, id: result?.id || null });
+    return res.status(200).json({ ok: true, id: result.messageId || null });
   } catch (error) {
-    return res.status(500).json({ error: error.message || 'Unexpected send failure.' });
+    return res.status(500).json({
+      error: error?.message || 'Unexpected SMTP send failure.',
+    });
   }
 }

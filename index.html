@@ -320,7 +320,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Max LTV (% of ARV)</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" step="0.5" value="70" oninput="syncFromInput('ltv',this.value)" />
+                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" step="0.5" value="70" oninput="syncInputDraft('ltv',this.value)" onblur="syncFromInput('ltv',this.value)" onchange="syncFromInput('ltv',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
@@ -330,7 +330,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Max LTC (% of total cost)</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" step="0.5" value="85" oninput="syncFromInput('ltc',this.value)" />
+                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" step="0.5" value="85" oninput="syncInputDraft('ltc',this.value)" onblur="syncFromInput('ltc',this.value)" onchange="syncFromInput('ltc',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
@@ -342,7 +342,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Purchase leverage</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" step="0.5" value="90" oninput="syncFromInput('purchLev',this.value)" />
+                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" step="0.5" value="90" oninput="syncInputDraft('purchLev',this.value)" onblur="syncFromInput('purchLev',this.value)" onchange="syncFromInput('purchLev',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
@@ -352,7 +352,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <div class="slider-label-row">
               <span class="slider-label">Rehab leverage</span>
               <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="rehabLevInput" min="50" max="100" value="100" oninput="syncFromInput('rehabLev',this.value)" />
+                <input class="slider-num-input" type="number" id="rehabLevInput" min="50" max="100" value="100" oninput="syncInputDraft('rehabLev',this.value)" onblur="syncFromInput('rehabLev',this.value)" onchange="syncFromInput('rehabLev',this.value)" />
                 <span class="slider-pct">%</span>
               </div>
             </div>
@@ -650,10 +650,27 @@ function syncFromSlider(type, val){
   updateAll();
 }
 
+function syncInputDraft(type, raw){
+  const cfg = SLIDER_CFG[type];
+  const input = document.getElementById(cfg.input);
+  input.value = raw;
+
+  const val = parseFloat(raw);
+  if(isNaN(val)) return;
+
+  const bounded = Math.max(cfg.min, Math.min(cfg.max, val));
+  document.getElementById(cfg.slider).value = bounded;
+  updateAll();
+}
+
 function syncFromInput(type, raw){
   const cfg = SLIDER_CFG[type];
   let val = parseFloat(raw);
-  if(isNaN(val)) return;
+  if(isNaN(val)){
+    document.getElementById(cfg.input).value = document.getElementById(cfg.slider).value;
+    updateAll();
+    return;
+  }
   val = Math.max(cfg.min, Math.min(cfg.max, Math.round(val * 2) / 2)); // snap to nearest 0.5
   document.getElementById(cfg.slider).value = val;
   document.getElementById(cfg.input).value  = val;

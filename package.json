@@ -1,0 +1,9 @@
+{
+  "name": "assetlift-term-sheet",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^7.0.10"
+  }
+}
