@@ -298,7 +298,10 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           <label class="toggle"><input type="checkbox" id="compareToggle" onchange="toggleCompareMode()"><div class="toggle-slider"></div></label>
         </div>
 
-        <!-- SINGLE MODE -->
+        <!-- Scenario A label (only visible in compare mode) -->
+        <div id="scenario-a-label" style="display:none;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#e8effc;color:#1a3a8f;padding:6px 10px;border-radius:6px;margin-bottom:14px;text-align:center;">Scenario A</div>
+
+        <!-- SINGLE MODE (also Scenario A in compare mode) -->
         <div id="terms-single">
           <div class="form-row">
             <div class="form-group">
@@ -388,98 +391,94 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           </div>
         </div><!-- end terms-single -->
 
-        <!-- COMPARE MODE: two columns -->
+        <!-- SCENARIO B (shown below Scenario A when compare mode is on) -->
         <div id="terms-compare" style="display:none;">
-          <div class="scenario-cols">
-            <!-- SCENARIO A -->
-            <div>
-              <div class="scenario-col-header a">Scenario A</div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Interest rate (% / year)</label>
-                <div class="pct-wrap"><input type="number" id="interestRate_a" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
-              </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Origination fee (%)</label>
-                <div class="pct-wrap"><input type="number" id="origFee_a" placeholder="e.g. 2" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
-              </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Loan term (months)</label>
-                <input type="number" id="loanTerm_a" value="12" min="1" max="360" oninput="updateAll()" />
-              </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Underwriting fee ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="uwFee_a" value="0" min="0" oninput="updateAll()" /></div>
-              </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Credit report fee ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="crFee_a" value="0" min="0" oninput="updateAll()" /></div>
-              </div>
-              <div class="form-group" style="margin-bottom:14px;">
-                <label>Other closing costs ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="otherCosts_a" value="0" min="0" oninput="updateAll()" /></div>
-              </div>
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Leverage &amp; Caps</div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Max LTV (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltvInput_a" min="50" max="95" value="70" oninput="syncFromInput('ltv_a',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="ltvSlider_a" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv_a',this.value)" />
-              </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Max LTC (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltcInput_a" min="50" max="100" value="85" oninput="syncFromInput('ltc_a',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="ltcSlider_a" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc_a',this.value)" />
-              </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Purchase leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="purchLevInput_a" min="50" max="100" value="90" oninput="syncFromInput('purchLev_a',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="purchLevSlider_a" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev_a',this.value)" />
-              </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Rehab leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="rehabLevInput_a" min="50" max="100" value="100" oninput="syncFromInput('rehabLev_a',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="rehabLevSlider_a" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev_a',this.value)" />
+          <hr class="divider">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#fdf3e3;color:#7a4500;padding:6px 10px;border-radius:6px;margin-bottom:14px;text-align:center;">Scenario B</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Interest rate (% / year)</label>
+              <div class="pct-wrap">
+                <input type="number" id="interestRate_b" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" />
+                <span class="pct-symbol">%</span>
               </div>
             </div>
-            <!-- SCENARIO B -->
-            <div>
-              <div class="scenario-col-header b">Scenario B</div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Interest rate (% / year)</label>
-                <div class="pct-wrap"><input type="number" id="interestRate_b" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+            <div class="form-group">
+              <label>Origination fee (%)</label>
+              <div class="pct-wrap">
+                <input type="number" id="origFee_b" placeholder="e.g. 2" step="0.1" oninput="updateAll()" />
+                <span class="pct-symbol">%</span>
               </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Origination fee (%)</label>
-                <div class="pct-wrap"><input type="number" id="origFee_b" placeholder="e.g. 2" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+            </div>
+            <div class="form-group">
+              <label>Loan term (months)</label>
+              <input type="number" id="loanTerm_b" value="12" min="1" max="360" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Underwriting fee ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="uwFee_b" value="0" min="0" oninput="updateAll()" />
               </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Loan term (months)</label>
-                <input type="number" id="loanTerm_b" value="12" min="1" max="360" oninput="updateAll()" />
+            </div>
+            <div class="form-group">
+              <label>Credit report fee ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="crFee_b" value="0" min="0" oninput="updateAll()" />
               </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Underwriting fee ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="uwFee_b" value="0" min="0" oninput="updateAll()" /></div>
+            </div>
+            <div class="form-group">
+              <label>Other closing costs ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="otherCosts_b" value="0" min="0" oninput="updateAll()" />
               </div>
-              <div class="form-group" style="margin-bottom:11px;">
-                <label>Credit report fee ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="crFee_b" value="0" min="0" oninput="updateAll()" /></div>
+            </div>
+          </div>
+          <hr class="divider">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;">Leverage &amp; LTV / LTC Controls</div>
+          <div class="slider-row" style="margin-bottom:18px;">
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Max LTV (% of ARV)</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="ltvInput_b" min="50" max="95" value="70" oninput="syncFromInput('ltv_b',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom:14px;">
-                <label>Other closing costs ($)</label>
-                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="otherCosts_b" value="0" min="0" oninput="updateAll()" /></div>
+              <input type="range" id="ltvSlider_b" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv_b',this.value)" />
+            </div>
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Max LTC (% of total cost)</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="ltcInput_b" min="50" max="100" value="85" oninput="syncFromInput('ltc_b',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
               </div>
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Leverage &amp; Caps</div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Max LTV (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltvInput_b" min="50" max="95" value="70" oninput="syncFromInput('ltv_b',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="ltvSlider_b" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv_b',this.value)" />
+              <input type="range" id="ltcSlider_b" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc_b',this.value)" />
+            </div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Purchase leverage</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="purchLevInput_b" min="50" max="100" value="90" oninput="syncFromInput('purchLev_b',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
               </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Max LTC (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltcInput_b" min="50" max="100" value="85" oninput="syncFromInput('ltc_b',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="ltcSlider_b" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc_b',this.value)" />
+              <input type="range" id="purchLevSlider_b" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev_b',this.value)" />
+            </div>
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Rehab leverage</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="rehabLevInput_b" min="50" max="100" value="100" oninput="syncFromInput('rehabLev_b',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
               </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Purchase leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="purchLevInput_b" min="50" max="100" value="90" oninput="syncFromInput('purchLev_b',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="purchLevSlider_b" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev_b',this.value)" />
-              </div>
-              <div class="slider-group">
-                <div class="slider-label-row"><span class="slider-label">Rehab leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="rehabLevInput_b" min="50" max="100" value="100" oninput="syncFromInput('rehabLev_b',this.value)" /><span class="slider-pct">%</span></div></div>
-                <input type="range" id="rehabLevSlider_b" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev_b',this.value)" />
-              </div>
+              <input type="range" id="rehabLevSlider_b" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev_b',this.value)" />
             </div>
           </div>
         </div><!-- end terms-compare -->
@@ -824,27 +823,23 @@ function toggleCheck(id)  { document.getElementById('chk-'+id).classList.toggle(
 /* ── COMPARE MODE ──────────────────────────────────────────── */
 function toggleCompareMode(){
   compareMode = document.getElementById('compareToggle').checked;
-  document.getElementById('terms-single').style.display  = compareMode ? 'none'  : 'block';
-  document.getElementById('terms-compare').style.display = compareMode ? 'grid'  : 'none';
-  document.getElementById('summary-single').style.display  = compareMode ? 'none'  : 'block';
-  document.getElementById('summary-compare').style.display = compareMode ? 'block' : 'none';
+  document.getElementById('scenario-a-label').style.display = compareMode ? 'block' : 'none';
+  document.getElementById('terms-compare').style.display    = compareMode ? 'block' : 'none';
+  document.getElementById('summary-single').style.display   = compareMode ? 'none'  : 'block';
+  document.getElementById('summary-compare').style.display  = compareMode ? 'block' : 'none';
   updateAll();
 }
 
 /* ── SLIDERS — bidirectional sync ──────────────────────────── */
 const SLIDER_CFG = {
-  ltv:        {slider:'ltvSlider',        input:'ltvInput',        min:50, max:95},
-  ltc:        {slider:'ltcSlider',        input:'ltcInput',        min:50, max:100},
-  purchLev:   {slider:'purchLevSlider',   input:'purchLevInput',   min:50, max:100},
-  rehabLev:   {slider:'rehabLevSlider',   input:'rehabLevInput',   min:50, max:100},
-  ltv_a:      {slider:'ltvSlider_a',      input:'ltvInput_a',      min:50, max:95},
-  ltc_a:      {slider:'ltcSlider_a',      input:'ltcInput_a',      min:50, max:100},
-  purchLev_a: {slider:'purchLevSlider_a', input:'purchLevInput_a', min:50, max:100},
-  rehabLev_a: {slider:'rehabLevSlider_a', input:'rehabLevInput_a', min:50, max:100},
-  ltv_b:      {slider:'ltvSlider_b',      input:'ltvInput_b',      min:50, max:95},
-  ltc_b:      {slider:'ltcSlider_b',      input:'ltcInput_b',      min:50, max:100},
-  purchLev_b: {slider:'purchLevSlider_b', input:'purchLevInput_b', min:50, max:100},
-  rehabLev_b: {slider:'rehabLevSlider_b', input:'rehabLevInput_b', min:50, max:100},
+  ltv:      {slider:'ltvSlider',      input:'ltvInput',      min:50, max:95},
+  ltc:      {slider:'ltcSlider',      input:'ltcInput',      min:50, max:100},
+  purchLev: {slider:'purchLevSlider', input:'purchLevInput', min:50, max:100},
+  rehabLev: {slider:'rehabLevSlider', input:'rehabLevInput', min:50, max:100},
+  ltv_b:    {slider:'ltvSlider_b',    input:'ltvInput_b',    min:50, max:95},
+  ltc_b:    {slider:'ltcSlider_b',    input:'ltcInput_b',    min:50, max:100},
+  purchLev_b:{slider:'purchLevSlider_b',input:'purchLevInput_b',min:50,max:100},
+  rehabLev_b:{slider:'rehabLevSlider_b',input:'rehabLevInput_b',min:50,max:100},
 };
 
 function syncFromSlider(type, val){
@@ -904,7 +899,7 @@ function getData(){
     compareMode,
   };
   if(compareMode){
-    const scenarioA = getTermData('_a');
+    const scenarioA = getTermData('');   // existing inputs ARE Scenario A
     const scenarioB = getTermData('_b');
     return {...shared, ...scenarioA, scenarioA, scenarioB};
   }
