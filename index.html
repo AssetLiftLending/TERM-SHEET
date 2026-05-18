@@ -443,6 +443,56 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
 
+    <div class="section-card open" id="sec-terms2">
+      <div class="section-header" onclick="toggleSection('terms2')">
+        <div class="section-check" id="chk-terms2" onclick="event.stopPropagation();toggleCheck('terms2')"></div>
+        <div class="section-title">Loan Terms — Scenario 2</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Interest rate (% / year)</label>
+            <div class="pct-wrap">
+              <input type="number" id="interestRate2" placeholder="e.g. 12.0" step="0.1" oninput="updateAll()" />
+              <span class="pct-symbol">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Origination fee (%)</label>
+            <div class="pct-wrap">
+              <input type="number" id="origFee2" placeholder="e.g. 2.5" step="0.1" oninput="updateAll()" />
+              <span class="pct-symbol">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Loan term (months)</label>
+            <input type="number" id="loanTerm2" value="12" min="1" max="360" oninput="updateAll()" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Underwriting fee ($)</label>
+            <div class="currency-wrap"><span class="currency-symbol">$</span>
+              <input type="number" id="uwFee2" value="0" min="0" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Credit report fee ($)</label>
+            <div class="currency-wrap"><span class="currency-symbol">$</span>
+              <input type="number" id="crFee2" value="0" min="0" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Other closing costs ($)</label>
+            <div class="currency-wrap"><span class="currency-symbol">$</span>
+              <input type="number" id="otherCosts2" value="0" min="0" oninput="updateAll()" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-card" id="sec-reserves">
       <div class="section-header" onclick="toggleSection('reserves')">
         <div class="section-check" id="chk-reserves" onclick="event.stopPropagation();toggleCheck('reserves')"></div>
@@ -569,6 +619,21 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           <div class="pdf-field"><span class="pf-label">Rehab Leverage</span><span class="pf-val" id="sm_rlev">—</span></div>
           <div class="pdf-field"><span class="pf-label">UW Fee</span><span class="pf-val" id="sm_uw">—</span></div>
           <div class="pdf-field"><span class="pf-label">Credit Report Fee</span><span class="pf-val" id="sm_cr">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-card open">
+      <div class="section-header"><div class="section-title">Loan Terms — Scenario 2</div></div>
+      <div class="section-body">
+        <div class="pdf-grid">
+          <div class="pdf-field"><span class="pf-label">Interest Rate</span><span class="pf-val" id="sm_rate2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Origination Fee</span><span class="pf-val" id="sm_orig2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="sm_term2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Monthly Payment</span><span class="pf-val" id="sm_monthly2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Total Fees</span><span class="pf-val" id="sm_fees2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Cash to Close</span><span class="pf-val" id="sm_close2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">UW Fee</span><span class="pf-val" id="sm_uw2">—</span></div>
+          <div class="pdf-field"><span class="pf-label">Credit Report Fee</span><span class="pf-val" id="sm_cr2">—</span></div>
         </div>
       </div>
     </div>
@@ -861,7 +926,13 @@ function getData(){
     t1: document.getElementById('t1').checked,
     t2: document.getElementById('t2').checked,
     t3: document.getElementById('t3').checked,
-    date: document.getElementById('datePickerInput').value
+    date: document.getElementById('datePickerInput').value,
+    rate2:  parseFloat(document.getElementById('interestRate2').value)||0,
+    orig2:  parseFloat(document.getElementById('origFee2').value)||0,
+    term2:  parseInt(document.getElementById('loanTerm2').value)||12,
+    uw2:    parseFloat(document.getElementById('uwFee2').value)||0,
+    cr2:    parseFloat(document.getElementById('crFee2').value)||0,
+    other2: parseFloat(document.getElementById('otherCosts2').value)||0
   };
 }
 
@@ -984,6 +1055,19 @@ function updateAll(){
   set('ccr_final', fmt$(c.cashToClose));
   set('ccr_loan_reserve', 'âˆ’ '+fmt$(c.reserveLoan));
   if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `Payment on purchase only: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.capReduction>0 ? ` Reduced by ${fmt$(c.reserveReduction)} from reserves, ${fmt$(c.purchaseReduction)} from purchase, and ${fmt$(c.rehabReduction)} from rehab.` : ''}`;
+
+  const monthly2    = c.loanAmt>0 && d.rate2>0 ? (c.loanAmt*(d.rate2/100))/12 : 0;
+  const origFeeAmt2 = c.loanAmt*(d.orig2/100);
+  const totalFees2  = origFeeAmt2 + d.uw2 + d.cr2 + d.other2;
+  const cashToClose2 = (d.pp - c.purchaseLoan) + totalFees2;
+  set('sm_rate2',    d.rate2 ? d.rate2+'% / yr' : '');
+  set('sm_orig2',    d.orig2 ? d.orig2+'%' : '');
+  set('sm_term2',    d.term2 ? d.term2+' months' : '');
+  set('sm_monthly2', fmt$(monthly2));
+  set('sm_fees2',    fmt$(totalFees2));
+  set('sm_close2',   fmt$(cashToClose2));
+  set('sm_uw2',      fmt$(d.uw2));
+  set('sm_cr2',      fmt$(d.cr2));
 }
 
 /* ── PDF OPTIONS ───────────────────────────────────────────── */
@@ -1106,6 +1190,21 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.other)}</span></div>
+    </div></div>`;
+    const monthly2pdf    = c.loanAmt>0 && d.rate2>0 ? (c.loanAmt*(d.rate2/100))/12 : 0;
+    const origFeeAmt2pdf = c.loanAmt*(d.orig2/100);
+    const totalFees2pdf  = origFeeAmt2pdf + d.uw2 + d.cr2 + d.other2;
+    const cashToClose2pdf = (d.pp - c.purchaseLoan) + totalFees2pdf;
+    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms — Scenario 2</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate2?d.rate2+'% / year':'—'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig2?d.orig2+'% ('+f(origFeeAmt2pdf)+')':'—'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term2} months</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Monthly Payment</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(monthly2pdf)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Fees</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(totalFees2pdf)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Cash to Close</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(cashToClose2pdf)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">UW Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw2)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr2)}</span></div>
     </div></div>`;
   }
 
