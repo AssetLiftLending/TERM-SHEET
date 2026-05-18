@@ -929,7 +929,12 @@ function calcLoan(d){
   const origFeeAmt   = loanAmt*(d.orig/100);
   const totalFees    = origFeeAmt + d.uw + d.cr + d.other;
   const cashToClose  = (d.pp - purchaseLoan) + totalFees;
-  return {loanAmt,purchaseLoan,rehabLoan,monthly,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0};
+  const effectivePurchasePct = d.pp    > 0 ? (purchaseLoan / d.pp    * 100) : 0;
+  const effectiveRehabPct    = d.rehab > 0 ? (rehabLoan    / d.rehab * 100) : 0;
+  const effectiveLtc         = tpc     > 0 ? (loanAmt      / tpc     * 100) : 0;
+  return {loanAmt,purchaseLoan,rehabLoan,monthly,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,
+    ltvCap:isFinite(ltvCap)?ltvCap:0, ltcCap:isFinite(ltcCap)?ltcCap:0,
+    effectivePurchasePct, effectiveRehabPct, effectiveLtc};
 }
 
 /* ── UPDATE ALL DISPLAYS ───────────────────────────────────── */
@@ -954,7 +959,8 @@ function updateAll(){
     set('cmp_ctcA',     fmt$(cA.cashToClose));set('cmp_ctcB',   fmt$(cB.cashToClose));
     set('cmp_rateA',  sA.rate ? sA.rate+'% / yr' : '—');
     set('cmp_rateB',  sB.rate ? sB.rate+'% / yr' : '—');
-    set('cmp_ltcA',   sA.ltc+'%');  set('cmp_ltcB',   sB.ltc+'%');
+    set('cmp_ltcA',   sA.ltc+'% (eff: '+cA.effectiveLtc.toFixed(1)+'%)');
+    set('cmp_ltcB',   sB.ltc+'% (eff: '+cB.effectiveLtc.toFixed(1)+'%)');
     set('cmp_ltvA',   sA.ltv+'%');  set('cmp_ltvB',   sB.ltv+'%');
     set('cmp_origA',  sA.orig ? sA.orig+'%' : '—');
     set('cmp_origB',  sB.orig ? sB.orig+'%' : '—');
@@ -991,8 +997,10 @@ function updateAll(){
     set('sm_rate', d.rate ? d.rate+'% / yr' : '');
     set('sm_orig', d.orig ? d.orig+'%' : '');
     set('sm_term', d.term ? d.term+' months' : '');
-    set('sm_ltv',  d.ltv+'%'); set('sm_ltc', d.ltc+'%');
-    set('sm_plev', d.plev+'%');set('sm_rlev',d.rlev+'%');
+    set('sm_ltv',  d.ltv+'%');
+    set('sm_ltc',  d.ltc+'% (effective: '+c.effectiveLtc.toFixed(1)+'%)');
+    set('sm_plev', d.plev+'% (effective: '+c.effectivePurchasePct.toFixed(1)+'%)');
+    set('sm_rlev', d.rlev+'% (effective: '+c.effectiveRehabPct.toFixed(1)+'%)');
     set('sm_uw', fmt$(d.uw)); set('sm_cr', fmt$(d.cr));
 
     // Cash to close tab
@@ -1141,9 +1149,9 @@ function buildTermSheetContent(){
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}% <span style="font-weight:400;color:#888;">(eff: ${c.effectiveLtc.toFixed(1)}%)</span></span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}% <span style="font-weight:400;color:#888;">(eff: ${c.effectivePurchasePct.toFixed(1)}%)</span></span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}% <span style="font-weight:400;color:#888;">(eff: ${c.effectiveRehabPct.toFixed(1)}%)</span></span></div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.other)}</span></div>
@@ -1345,10 +1353,13 @@ function downloadLoanSummaryExcel(){
       ['Total Fees',           f(c.totalFees)],
       [],
       ['LEVERAGE CONTROLS'],
-      ['Max LTV (% of ARV)',   d.ltv],
-      ['Max LTC (% of cost)',  d.ltc],
-      ['Purchase Leverage (%)',d.plev],
-      ['Rehab Leverage (%)',   d.rlev],
+      ['Max LTV (% of ARV)',           d.ltv],
+      ['Max LTC — max setting (%)',    d.ltc],
+      ['Max LTC — effective (%)',      +c.effectiveLtc.toFixed(1)],
+      ['Purchase Leverage — max (%)',  d.plev],
+      ['Purchase Leverage — eff (%)',  +c.effectivePurchasePct.toFixed(1)],
+      ['Rehab Leverage — max (%)',     d.rlev],
+      ['Rehab Leverage — eff (%)',     +c.effectiveRehabPct.toFixed(1)],
       [],
       ['CASH TO CLOSE'],
       ['Purchase Price',       f(d.pp)],
