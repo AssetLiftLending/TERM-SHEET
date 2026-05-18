@@ -1768,6 +1768,15 @@ function ensureDerivedFieldUi(){
     cashBreakdown.insertBefore(reserveRow, document.getElementById('ccr_orig').parentElement);
     cashBreakdown.appendChild(note);
   }
+
+  const compareCards = document.querySelectorAll('#comparePreview .compare-card');
+  if(compareCards.length === 2 && !document.getElementById('cmpANote')){
+    const noteA = document.createElement('div');
+    noteA.className = 'compare-note';
+    noteA.id = 'cmpANote';
+    noteA.textContent = 'Current leverage settings.';
+    compareCards[0].appendChild(noteA);
+  }
 }
 
 async function sendTermsEmail(){

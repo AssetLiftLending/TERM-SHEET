@@ -152,6 +152,26 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .pdf-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;}
 .pdf-modal-body{overflow-y:auto;max-height:65vh;padding:0;}
 .pdf-modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--bg);}
+
+/* COMPARE MODE */
+.compare-toggle-row{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--border);gap:16px;}
+.compare-toggle-info strong{font-size:14px;font-weight:600;color:var(--text);display:block;margin-bottom:2px;}
+.compare-toggle-info span{font-size:12px;color:var(--muted);}
+.scenario-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.scenario-col-header{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:6px 10px;border-radius:6px;margin-bottom:12px;text-align:center;}
+.scenario-col-header.a{background:#e8effc;color:#1a3a8f;}
+.scenario-col-header.b{background:#fdf3e3;color:#7a4500;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.compare-card{border-radius:10px;padding:14px;border:1px solid var(--border);background:var(--surface);}
+.compare-card.a{border-top:3px solid #1a3a8f;}
+.compare-card.b{border-top:3px solid var(--gold);}
+.compare-card-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.compare-card-label.a{color:#1a3a8f;}
+.compare-card-label.b{color:#7a4500;}
+.compare-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.compare-metric{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 10px;text-align:center;}
+.compare-metric .cm-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.compare-metric .cm-val{font-size:13px;font-weight:700;color:var(--navy);}
 </style>
 </head>
 <body>
@@ -269,92 +289,201 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
         <div class="section-chevron">▼</div>
       </div>
       <div class="section-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Interest rate (% / year)</label>
-            <div class="pct-wrap">
-              <input type="number" id="interestRate" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" />
-              <span class="pct-symbol">%</span>
-            </div>
+        <!-- Compare Toggle -->
+        <div class="compare-toggle-row">
+          <div class="compare-toggle-info">
+            <strong>Compare Two Scenarios</strong>
+            <span>Enable to set independent terms for Scenario A vs Scenario B</span>
           </div>
-          <div class="form-group">
-            <label>Origination fee (%)</label>
-            <div class="pct-wrap">
-              <input type="number" id="origFee" placeholder="e.g. 2" step="0.1" oninput="updateAll()" />
-              <span class="pct-symbol">%</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Loan term (months)</label>
-            <input type="number" id="loanTerm" value="12" min="1" max="360" oninput="updateAll()" />
-          </div>
+          <label class="toggle"><input type="checkbox" id="compareToggle" onchange="toggleCompareMode()"><div class="toggle-slider"></div></label>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Underwriting fee ($)</label>
-            <div class="currency-wrap"><span class="currency-symbol">$</span>
-              <input type="number" id="uwFee" value="0" min="0" oninput="updateAll()" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Credit report fee ($)</label>
-            <div class="currency-wrap"><span class="currency-symbol">$</span>
-              <input type="number" id="crFee" value="0" min="0" oninput="updateAll()" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Other closing costs ($)</label>
-            <div class="currency-wrap"><span class="currency-symbol">$</span>
-              <input type="number" id="otherCosts" value="0" min="0" oninput="updateAll()" />
-            </div>
-          </div>
-        </div>
-        <hr class="divider">
-        <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;">Leverage &amp; LTV / LTC Controls</div>
-        <div class="slider-row" style="margin-bottom:18px;">
-          <div class="slider-group">
-            <div class="slider-label-row">
-              <span class="slider-label">Max LTV (% of ARV)</span>
-              <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" value="70" oninput="syncFromInput('ltv',this.value)" />
-                <span class="slider-pct">%</span>
+
+        <!-- SINGLE MODE -->
+        <div id="terms-single">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Interest rate (% / year)</label>
+              <div class="pct-wrap">
+                <input type="number" id="interestRate" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" />
+                <span class="pct-symbol">%</span>
               </div>
             </div>
-            <input type="range" id="ltvSlider" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv',this.value)" />
-          </div>
-          <div class="slider-group">
-            <div class="slider-label-row">
-              <span class="slider-label">Max LTC (% of total cost)</span>
-              <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" value="85" oninput="syncFromInput('ltc',this.value)" />
-                <span class="slider-pct">%</span>
+            <div class="form-group">
+              <label>Origination fee (%)</label>
+              <div class="pct-wrap">
+                <input type="number" id="origFee" placeholder="e.g. 2" step="0.1" oninput="updateAll()" />
+                <span class="pct-symbol">%</span>
               </div>
             </div>
-            <input type="range" id="ltcSlider" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc',this.value)" />
+            <div class="form-group">
+              <label>Loan term (months)</label>
+              <input type="number" id="loanTerm" value="12" min="1" max="360" oninput="updateAll()" />
+            </div>
           </div>
-        </div>
-        <div class="slider-row">
-          <div class="slider-group">
-            <div class="slider-label-row">
-              <span class="slider-label">Purchase leverage</span>
-              <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" value="90" oninput="syncFromInput('purchLev',this.value)" />
-                <span class="slider-pct">%</span>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Underwriting fee ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="uwFee" value="0" min="0" oninput="updateAll()" />
               </div>
             </div>
-            <input type="range" id="purchLevSlider" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev',this.value)" />
-          </div>
-          <div class="slider-group">
-            <div class="slider-label-row">
-              <span class="slider-label">Rehab leverage</span>
-              <div class="slider-val-wrap">
-                <input class="slider-num-input" type="number" id="rehabLevInput" min="50" max="100" value="100" oninput="syncFromInput('rehabLev',this.value)" />
-                <span class="slider-pct">%</span>
+            <div class="form-group">
+              <label>Credit report fee ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="crFee" value="0" min="0" oninput="updateAll()" />
               </div>
             </div>
-            <input type="range" id="rehabLevSlider" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev',this.value)" />
+            <div class="form-group">
+              <label>Other closing costs ($)</label>
+              <div class="currency-wrap"><span class="currency-symbol">$</span>
+                <input type="number" id="otherCosts" value="0" min="0" oninput="updateAll()" />
+              </div>
+            </div>
           </div>
-        </div>
+          <hr class="divider">
+          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;">Leverage &amp; LTV / LTC Controls</div>
+          <div class="slider-row" style="margin-bottom:18px;">
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Max LTV (% of ARV)</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" value="70" oninput="syncFromInput('ltv',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
+              </div>
+              <input type="range" id="ltvSlider" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv',this.value)" />
+            </div>
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Max LTC (% of total cost)</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="ltcInput" min="50" max="100" value="85" oninput="syncFromInput('ltc',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
+              </div>
+              <input type="range" id="ltcSlider" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc',this.value)" />
+            </div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Purchase leverage</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="purchLevInput" min="50" max="100" value="90" oninput="syncFromInput('purchLev',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
+              </div>
+              <input type="range" id="purchLevSlider" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev',this.value)" />
+            </div>
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span class="slider-label">Rehab leverage</span>
+                <div class="slider-val-wrap">
+                  <input class="slider-num-input" type="number" id="rehabLevInput" min="50" max="100" value="100" oninput="syncFromInput('rehabLev',this.value)" />
+                  <span class="slider-pct">%</span>
+                </div>
+              </div>
+              <input type="range" id="rehabLevSlider" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev',this.value)" />
+            </div>
+          </div>
+        </div><!-- end terms-single -->
+
+        <!-- COMPARE MODE: two columns -->
+        <div id="terms-compare" style="display:none;">
+          <div class="scenario-cols">
+            <!-- SCENARIO A -->
+            <div>
+              <div class="scenario-col-header a">Scenario A</div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Interest rate (% / year)</label>
+                <div class="pct-wrap"><input type="number" id="interestRate_a" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Origination fee (%)</label>
+                <div class="pct-wrap"><input type="number" id="origFee_a" placeholder="e.g. 2" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Loan term (months)</label>
+                <input type="number" id="loanTerm_a" value="12" min="1" max="360" oninput="updateAll()" />
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Underwriting fee ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="uwFee_a" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Credit report fee ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="crFee_a" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Other closing costs ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="otherCosts_a" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Leverage &amp; Caps</div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Max LTV (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltvInput_a" min="50" max="95" value="70" oninput="syncFromInput('ltv_a',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="ltvSlider_a" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv_a',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Max LTC (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltcInput_a" min="50" max="100" value="85" oninput="syncFromInput('ltc_a',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="ltcSlider_a" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc_a',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Purchase leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="purchLevInput_a" min="50" max="100" value="90" oninput="syncFromInput('purchLev_a',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="purchLevSlider_a" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev_a',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Rehab leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="rehabLevInput_a" min="50" max="100" value="100" oninput="syncFromInput('rehabLev_a',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="rehabLevSlider_a" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev_a',this.value)" />
+              </div>
+            </div>
+            <!-- SCENARIO B -->
+            <div>
+              <div class="scenario-col-header b">Scenario B</div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Interest rate (% / year)</label>
+                <div class="pct-wrap"><input type="number" id="interestRate_b" placeholder="e.g. 11.5" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Origination fee (%)</label>
+                <div class="pct-wrap"><input type="number" id="origFee_b" placeholder="e.g. 2" step="0.1" oninput="updateAll()" /><span class="pct-symbol">%</span></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Loan term (months)</label>
+                <input type="number" id="loanTerm_b" value="12" min="1" max="360" oninput="updateAll()" />
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Underwriting fee ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="uwFee_b" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div class="form-group" style="margin-bottom:11px;">
+                <label>Credit report fee ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="crFee_b" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Other closing costs ($)</label>
+                <div class="currency-wrap"><span class="currency-symbol">$</span><input type="number" id="otherCosts_b" value="0" min="0" oninput="updateAll()" /></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;">Leverage &amp; Caps</div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Max LTV (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltvInput_b" min="50" max="95" value="70" oninput="syncFromInput('ltv_b',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="ltvSlider_b" min="50" max="95" step="1" value="70" oninput="syncFromSlider('ltv_b',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Max LTC (%)</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="ltcInput_b" min="50" max="100" value="85" oninput="syncFromInput('ltc_b',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="ltcSlider_b" min="50" max="100" step="1" value="85" oninput="syncFromSlider('ltc_b',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Purchase leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="purchLevInput_b" min="50" max="100" value="90" oninput="syncFromInput('purchLev_b',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="purchLevSlider_b" min="50" max="100" step="1" value="90" oninput="syncFromSlider('purchLev_b',this.value)" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-label-row"><span class="slider-label">Rehab leverage</span><div class="slider-val-wrap"><input class="slider-num-input" type="number" id="rehabLevInput_b" min="50" max="100" value="100" oninput="syncFromInput('rehabLev_b',this.value)" /><span class="slider-pct">%</span></div></div>
+                <input type="range" id="rehabLevSlider_b" min="50" max="100" step="1" value="100" oninput="syncFromSlider('rehabLev_b',this.value)" />
+              </div>
+            </div>
+          </div>
+        </div><!-- end terms-compare -->
+
       </div>
     </div>
 
@@ -393,12 +522,92 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 
   <!-- SUMMARY TAB -->
   <div id="tab-summary" class="tab-panel">
-    <div class="metric-row">
-      <div class="metric-card"><div class="mc-label">Loan Amount</div><div class="mc-val" id="smLoanAmt">—</div></div>
-      <div class="metric-card"><div class="mc-label">Monthly Payment</div><div class="mc-val" id="smMonthly">—</div></div>
-      <div class="metric-card"><div class="mc-label">Total Fees</div><div class="mc-val" id="smFees">—</div></div>
-      <div class="metric-card"><div class="mc-label">Limiting Factor</div><div class="mc-val" id="smLimit" style="font-size:13px;">—</div></div>
-    </div>
+
+    <!-- SINGLE MODE SUMMARY -->
+    <div id="summary-single">
+      <div class="metric-row">
+        <div class="metric-card"><div class="mc-label">Loan Amount</div><div class="mc-val" id="smLoanAmt">—</div></div>
+        <div class="metric-card"><div class="mc-label">Monthly Payment</div><div class="mc-val" id="smMonthly">—</div></div>
+        <div class="metric-card"><div class="mc-label">Total Fees</div><div class="mc-val" id="smFees">—</div></div>
+        <div class="metric-card"><div class="mc-label">Limiting Factor</div><div class="mc-val" id="smLimit" style="font-size:13px;">—</div></div>
+      </div>
+      <div class="section-card open">
+        <div class="section-header"><div class="section-title">Loan Terms &amp; Numbers</div></div>
+        <div class="section-body">
+          <div class="pdf-grid">
+            <div class="pdf-field"><span class="pf-label">Purchase Price</span><span class="pf-val" id="sm_pp">—</span></div>
+            <div class="pdf-field"><span class="pf-label">ARV</span><span class="pf-val" id="sm_arv">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Rehab Budget</span><span class="pf-val" id="sm_rehab">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Total Project Cost</span><span class="pf-val" id="sm_tpc">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Interest Rate</span><span class="pf-val" id="sm_rate">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Origination Fee</span><span class="pf-val" id="sm_orig">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="sm_term">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTV</span><span class="pf-val" id="sm_ltv">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTC</span><span class="pf-val" id="sm_ltc">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Purchase Leverage</span><span class="pf-val" id="sm_plev">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Rehab Leverage</span><span class="pf-val" id="sm_rlev">—</span></div>
+            <div class="pdf-field"><span class="pf-label">UW Fee</span><span class="pf-val" id="sm_uw">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Credit Report Fee</span><span class="pf-val" id="sm_cr">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end summary-single -->
+
+    <!-- COMPARE MODE SUMMARY -->
+    <div id="summary-compare" style="display:none;">
+      <div class="compare-grid">
+        <!-- Scenario A -->
+        <div class="compare-card a">
+          <div class="compare-card-label a">Scenario A</div>
+          <div class="compare-metrics">
+            <div class="compare-metric"><div class="cm-label">Loan Amount</div><div class="cm-val" id="cmp_loanA">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Monthly Payment</div><div class="cm-val" id="cmp_monthlyA">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Total Fees</div><div class="cm-val" id="cmp_feesA">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Cash to Close</div><div class="cm-val" id="cmp_ctcA">—</div></div>
+          </div>
+          <div class="pdf-grid">
+            <div class="pdf-field"><span class="pf-label">Interest Rate</span><span class="pf-val" id="cmp_rateA">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTC</span><span class="pf-val" id="cmp_ltcA">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTV</span><span class="pf-val" id="cmp_ltvA">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Orig. Fee</span><span class="pf-val" id="cmp_origA">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="cmp_termA">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Limiting Factor</span><span class="pf-val" id="cmp_limitA">—</span></div>
+          </div>
+        </div>
+        <!-- Scenario B -->
+        <div class="compare-card b">
+          <div class="compare-card-label b">Scenario B</div>
+          <div class="compare-metrics">
+            <div class="compare-metric"><div class="cm-label">Loan Amount</div><div class="cm-val" id="cmp_loanB">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Monthly Payment</div><div class="cm-val" id="cmp_monthlyB">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Total Fees</div><div class="cm-val" id="cmp_feesB">—</div></div>
+            <div class="compare-metric"><div class="cm-label">Cash to Close</div><div class="cm-val" id="cmp_ctcB">—</div></div>
+          </div>
+          <div class="pdf-grid">
+            <div class="pdf-field"><span class="pf-label">Interest Rate</span><span class="pf-val" id="cmp_rateB">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTC</span><span class="pf-val" id="cmp_ltcB">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Max LTV</span><span class="pf-val" id="cmp_ltvB">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Orig. Fee</span><span class="pf-val" id="cmp_origB">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="cmp_termB">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Limiting Factor</span><span class="pf-val" id="cmp_limitB">—</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Shared property info in compare mode -->
+      <div class="section-card open">
+        <div class="section-header"><div class="section-title">Property Numbers (Shared)</div></div>
+        <div class="section-body">
+          <div class="pdf-grid">
+            <div class="pdf-field"><span class="pf-label">Purchase Price</span><span class="pf-val" id="cmp_pp">—</span></div>
+            <div class="pdf-field"><span class="pf-label">ARV</span><span class="pf-val" id="cmp_arv">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Rehab Budget</span><span class="pf-val" id="cmp_rehab">—</span></div>
+            <div class="pdf-field"><span class="pf-label">Total Project Cost</span><span class="pf-val" id="cmp_tpc">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end summary-compare -->
+
+    <!-- Borrower & Property (always shown) -->
     <div class="section-card open">
       <div class="section-header"><div class="section-title">Borrower &amp; Property</div></div>
       <div class="section-body">
@@ -408,26 +617,6 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           <div class="pdf-field"><span class="pf-label">Address</span><span class="pf-val" id="sm_address">—</span></div>
           <div class="pdf-field"><span class="pf-label">Purpose</span><span class="pf-val" id="sm_purpose">—</span></div>
           <div class="pdf-field"><span class="pf-label">Closing Date</span><span class="pf-val" id="sm_closing">—</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="section-card open">
-      <div class="section-header"><div class="section-title">Loan Terms &amp; Numbers</div></div>
-      <div class="section-body">
-        <div class="pdf-grid">
-          <div class="pdf-field"><span class="pf-label">Purchase Price</span><span class="pf-val" id="sm_pp">—</span></div>
-          <div class="pdf-field"><span class="pf-label">ARV</span><span class="pf-val" id="sm_arv">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Rehab Budget</span><span class="pf-val" id="sm_rehab">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Total Project Cost</span><span class="pf-val" id="sm_tpc">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Interest Rate</span><span class="pf-val" id="sm_rate">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Origination Fee</span><span class="pf-val" id="sm_orig">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="sm_term">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Max LTV</span><span class="pf-val" id="sm_ltv">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Max LTC</span><span class="pf-val" id="sm_ltc">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Purchase Leverage</span><span class="pf-val" id="sm_plev">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Rehab Leverage</span><span class="pf-val" id="sm_rlev">—</span></div>
-          <div class="pdf-field"><span class="pf-label">UW Fee</span><span class="pf-val" id="sm_uw">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Credit Report Fee</span><span class="pf-val" id="sm_cr">—</span></div>
         </div>
       </div>
     </div>
@@ -580,6 +769,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 
 <script>
 document.getElementById('datePickerInput').value = new Date().toISOString().split('T')[0];
+let compareMode = false;
 
 /* ── CHECKLIST ─────────────────────────────────────────────── */
 const checklistItems = [
@@ -631,12 +821,30 @@ function switchTab(name, btn){
 function toggleSection(id){ document.getElementById('sec-'+id).classList.toggle('open'); }
 function toggleCheck(id)  { document.getElementById('chk-'+id).classList.toggle('checked'); }
 
+/* ── COMPARE MODE ──────────────────────────────────────────── */
+function toggleCompareMode(){
+  compareMode = document.getElementById('compareToggle').checked;
+  document.getElementById('terms-single').style.display  = compareMode ? 'none'  : 'block';
+  document.getElementById('terms-compare').style.display = compareMode ? 'grid'  : 'none';
+  document.getElementById('summary-single').style.display  = compareMode ? 'none'  : 'block';
+  document.getElementById('summary-compare').style.display = compareMode ? 'block' : 'none';
+  updateAll();
+}
+
 /* ── SLIDERS — bidirectional sync ──────────────────────────── */
 const SLIDER_CFG = {
-  ltv:      {slider:'ltvSlider',      input:'ltvInput',      min:50, max:95},
-  ltc:      {slider:'ltcSlider',      input:'ltcInput',      min:50, max:100},
-  purchLev: {slider:'purchLevSlider', input:'purchLevInput', min:50, max:100},
-  rehabLev: {slider:'rehabLevSlider', input:'rehabLevInput', min:50, max:100}
+  ltv:        {slider:'ltvSlider',        input:'ltvInput',        min:50, max:95},
+  ltc:        {slider:'ltcSlider',        input:'ltcInput',        min:50, max:100},
+  purchLev:   {slider:'purchLevSlider',   input:'purchLevInput',   min:50, max:100},
+  rehabLev:   {slider:'rehabLevSlider',   input:'rehabLevInput',   min:50, max:100},
+  ltv_a:      {slider:'ltvSlider_a',      input:'ltvInput_a',      min:50, max:95},
+  ltc_a:      {slider:'ltcSlider_a',      input:'ltcInput_a',      min:50, max:100},
+  purchLev_a: {slider:'purchLevSlider_a', input:'purchLevInput_a', min:50, max:100},
+  rehabLev_a: {slider:'rehabLevSlider_a', input:'rehabLevInput_a', min:50, max:100},
+  ltv_b:      {slider:'ltvSlider_b',      input:'ltvInput_b',      min:50, max:95},
+  ltc_b:      {slider:'ltcSlider_b',      input:'ltcInput_b',      min:50, max:100},
+  purchLev_b: {slider:'purchLevSlider_b', input:'purchLevInput_b', min:50, max:100},
+  rehabLev_b: {slider:'rehabLevSlider_b', input:'rehabLevInput_b', min:50, max:100},
 };
 
 function syncFromSlider(type, val){
@@ -661,8 +869,24 @@ function fmt$(n){
   return '$'+Math.round(n).toLocaleString('en-US');
 }
 
-function getData(){
+function getTermData(suf){
+  const s = suf || '';
   return {
+    rate:  parseFloat(document.getElementById('interestRate'+s).value)||0,
+    orig:  parseFloat(document.getElementById('origFee'+s).value)||0,
+    term:  parseInt(document.getElementById('loanTerm'+s).value)||12,
+    uw:    parseFloat(document.getElementById('uwFee'+s).value)||0,
+    cr:    parseFloat(document.getElementById('crFee'+s).value)||0,
+    other: parseFloat(document.getElementById('otherCosts'+s).value)||0,
+    ltv:   parseInt(document.getElementById('ltvSlider'+s).value)||70,
+    ltc:   parseInt(document.getElementById('ltcSlider'+s).value)||85,
+    plev:  parseInt(document.getElementById('purchLevSlider'+s).value)||90,
+    rlev:  parseInt(document.getElementById('rehabLevSlider'+s).value)||100,
+  };
+}
+
+function getData(){
+  const shared = {
     borrower: document.getElementById('borrowerName').value,
     address:  document.getElementById('propAddress').value,
     program:  document.getElementById('loanProgram').value,
@@ -673,21 +897,18 @@ function getData(){
     pp:       parseFloat(document.getElementById('purchasePrice').value)||0,
     arv:      parseFloat(document.getElementById('arv').value)||0,
     rehab:    parseFloat(document.getElementById('rehabBudget').value)||0,
-    rate:     parseFloat(document.getElementById('interestRate').value)||0,
-    orig:     parseFloat(document.getElementById('origFee').value)||0,
-    term:     parseInt(document.getElementById('loanTerm').value)||12,
-    uw:       parseFloat(document.getElementById('uwFee').value)||0,
-    cr:       parseFloat(document.getElementById('crFee').value)||0,
-    other:    parseFloat(document.getElementById('otherCosts').value)||0,
-    ltv:      parseInt(document.getElementById('ltvSlider').value),
-    ltc:      parseInt(document.getElementById('ltcSlider').value),
-    plev:     parseInt(document.getElementById('purchLevSlider').value),
-    rlev:     parseInt(document.getElementById('rehabLevSlider').value),
     t1: document.getElementById('t1').checked,
     t2: document.getElementById('t2').checked,
     t3: document.getElementById('t3').checked,
-    date: document.getElementById('datePickerInput').value
+    date: document.getElementById('datePickerInput').value,
+    compareMode,
   };
+  if(compareMode){
+    const scenarioA = getTermData('_a');
+    const scenarioB = getTermData('_b');
+    return {...shared, ...scenarioA, scenarioA, scenarioB};
+  }
+  return {...shared, ...getTermData('')};
 }
 
 function calcLoan(d){
@@ -714,40 +935,79 @@ function calcLoan(d){
 /* ── UPDATE ALL DISPLAYS ───────────────────────────────────── */
 function updateAll(){
   const d = getData();
-  const c = calcLoan(d);
   const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = (v||v===0) ? v : '—'; };
 
-  // summary metrics
-  document.getElementById('smLoanAmt').textContent = fmt$(c.loanAmt);
-  document.getElementById('smMonthly').textContent = fmt$(c.monthly);
-  document.getElementById('smFees').textContent    = fmt$(c.totalFees);
-  document.getElementById('smLimit').textContent   = c.limitingFactor;
-
-  // summary tab fields
+  // Borrower/property always shown
   set('sm_borrower', d.borrower); set('sm_program', d.program);
   set('sm_address',  d.address);  set('sm_purpose', d.purpose);
   set('sm_closing',  d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '');
-  set('sm_pp',   fmt$(d.pp));   set('sm_arv',  fmt$(d.arv));
-  set('sm_rehab',fmt$(d.rehab));set('sm_tpc',  fmt$(c.tpc));
-  set('sm_rate', d.rate ? d.rate+'% / yr' : '');
-  set('sm_orig', d.orig ? d.orig+'%' : '');
-  set('sm_term', d.term ? d.term+' months' : '');
-  set('sm_ltv',  d.ltv+'%'); set('sm_ltc', d.ltc+'%');
-  set('sm_plev', d.plev+'%');set('sm_rlev',d.rlev+'%');
-  set('sm_uw', fmt$(d.uw)); set('sm_cr', fmt$(d.cr));
 
-  // cash to close tab
-  set('cc_total', fmt$(c.cashToClose));
-  document.getElementById('cc_sub').textContent = c.cashToClose<=0 ? 'No cash required at closing' : 'Required at closing table';
-  set('cc_constraint', c.limitingFactor);
-  set('ccr_pp',fmt$(d.pp)); set('ccr_rehab',fmt$(d.rehab)); set('ccr_tpc',fmt$(c.tpc));
-  set('ccr_loan_pp', '− '+fmt$(c.purchaseLoan));
-  set('ccr_loan_rh', '− '+fmt$(c.rehabLoan));
-  set('ccr_orig',  fmt$(c.origFeeAmt));
-  set('ccr_uw',    fmt$(d.uw));
-  set('ccr_cr',    fmt$(d.cr));
-  set('ccr_other', fmt$(d.other));
-  set('ccr_final', fmt$(c.cashToClose));
+  if(compareMode && d.scenarioA && d.scenarioB){
+    const cA = calcLoan({...d, ...d.scenarioA});
+    const cB = calcLoan({...d, ...d.scenarioB});
+    const sA = d.scenarioA, sB = d.scenarioB;
+
+    // Compare summary metrics
+    set('cmp_loanA',    fmt$(cA.loanAmt));  set('cmp_loanB',    fmt$(cB.loanAmt));
+    set('cmp_monthlyA', fmt$(cA.monthly));  set('cmp_monthlyB', fmt$(cB.monthly));
+    set('cmp_feesA',    fmt$(cA.totalFees));set('cmp_feesB',    fmt$(cB.totalFees));
+    set('cmp_ctcA',     fmt$(cA.cashToClose));set('cmp_ctcB',   fmt$(cB.cashToClose));
+    set('cmp_rateA',  sA.rate ? sA.rate+'% / yr' : '—');
+    set('cmp_rateB',  sB.rate ? sB.rate+'% / yr' : '—');
+    set('cmp_ltcA',   sA.ltc+'%');  set('cmp_ltcB',   sB.ltc+'%');
+    set('cmp_ltvA',   sA.ltv+'%');  set('cmp_ltvB',   sB.ltv+'%');
+    set('cmp_origA',  sA.orig ? sA.orig+'%' : '—');
+    set('cmp_origB',  sB.orig ? sB.orig+'%' : '—');
+    set('cmp_termA',  sA.term ? sA.term+' months' : '—');
+    set('cmp_termB',  sB.term ? sB.term+' months' : '—');
+    set('cmp_limitA', cA.limitingFactor); set('cmp_limitB', cB.limitingFactor);
+    set('cmp_pp',   fmt$(d.pp)); set('cmp_arv',  fmt$(d.arv));
+    set('cmp_rehab',fmt$(d.rehab)); set('cmp_tpc', fmt$(cA.tpc));
+
+    // Cash to close tab shows Scenario A when in compare mode
+    set('cc_total', fmt$(cA.cashToClose));
+    document.getElementById('cc_sub').textContent = 'Scenario A (switch off Compare for Scenario B)';
+    set('cc_constraint', cA.limitingFactor);
+    set('ccr_pp',fmt$(d.pp)); set('ccr_rehab',fmt$(d.rehab)); set('ccr_tpc',fmt$(cA.tpc));
+    set('ccr_loan_pp', '− '+fmt$(cA.purchaseLoan));
+    set('ccr_loan_rh', '− '+fmt$(cA.rehabLoan));
+    set('ccr_orig',  fmt$(cA.origFeeAmt));
+    set('ccr_uw',    fmt$(sA.uw));
+    set('ccr_cr',    fmt$(sA.cr));
+    set('ccr_other', fmt$(sA.other));
+    set('ccr_final', fmt$(cA.cashToClose));
+  } else {
+    const c = calcLoan(d);
+
+    // Single-mode summary metrics
+    document.getElementById('smLoanAmt').textContent = fmt$(c.loanAmt);
+    document.getElementById('smMonthly').textContent = fmt$(c.monthly);
+    document.getElementById('smFees').textContent    = fmt$(c.totalFees);
+    document.getElementById('smLimit').textContent   = c.limitingFactor;
+
+    // Single summary fields
+    set('sm_pp',   fmt$(d.pp));   set('sm_arv',  fmt$(d.arv));
+    set('sm_rehab',fmt$(d.rehab));set('sm_tpc',  fmt$(c.tpc));
+    set('sm_rate', d.rate ? d.rate+'% / yr' : '');
+    set('sm_orig', d.orig ? d.orig+'%' : '');
+    set('sm_term', d.term ? d.term+' months' : '');
+    set('sm_ltv',  d.ltv+'%'); set('sm_ltc', d.ltc+'%');
+    set('sm_plev', d.plev+'%');set('sm_rlev',d.rlev+'%');
+    set('sm_uw', fmt$(d.uw)); set('sm_cr', fmt$(d.cr));
+
+    // Cash to close tab
+    set('cc_total', fmt$(c.cashToClose));
+    document.getElementById('cc_sub').textContent = c.cashToClose<=0 ? 'No cash required at closing' : 'Required at closing table';
+    set('cc_constraint', c.limitingFactor);
+    set('ccr_pp',fmt$(d.pp)); set('ccr_rehab',fmt$(d.rehab)); set('ccr_tpc',fmt$(c.tpc));
+    set('ccr_loan_pp', '− '+fmt$(c.purchaseLoan));
+    set('ccr_loan_rh', '− '+fmt$(c.rehabLoan));
+    set('ccr_orig',  fmt$(c.origFeeAmt));
+    set('ccr_uw',    fmt$(d.uw));
+    set('ccr_cr',    fmt$(d.cr));
+    set('ccr_other', fmt$(d.other));
+    set('ccr_final', fmt$(c.cashToClose));
+  }
 }
 
 /* ── PDF OPTIONS ───────────────────────────────────────────── */
@@ -761,7 +1021,9 @@ function togglePdfOpt(name){
 
 /* ── BUILD TERM SHEET PDF CONTENT ──────────────────────────── */
 function buildTermSheetContent(){
-  const d=getData(); const c=calcLoan(d);
+  const d=getData();
+  const c=compareMode && d.scenarioA ? calcLoan({...d,...d.scenarioA}) : calcLoan(d);
+  const cB=compareMode && d.scenarioB ? calcLoan({...d,...d.scenarioB}) : null;
   const incSummary  = document.getElementById('pdfIncludeSummary').checked;
   const incTerms    = document.getElementById('pdfIncludeTerms').checked;
   const incReserves = document.getElementById('pdfIncludeReserves').checked;
@@ -794,48 +1056,99 @@ function buildTermSheetContent(){
   }
 
   if(incMetrics){
-    h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Loan Amount</div>
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.loanAmt)}</div>
-        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">${c.limitingFactor}</div>
-      </div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Monthly Payment</div>
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.monthly)}</div>
-        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Interest only</div>
-      </div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Total Fees</div>
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.totalFees)}</div>
-        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">At closing</div>
-      </div>
-      <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Cash to Close</div>
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.cashToClose)}</div>
-        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Required</div>
-      </div>
-    </div>`;
+    if(compareMode && d.scenarioA && d.scenarioB && cB){
+      const pdfMetric=(label,valA,valB,subA,subB)=>`
+        <div style="background:#0f1e3c;border-radius:6px;padding:10px;text-align:center;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">${label}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div><div style="font-size:8px;color:#c9a84c;margin-bottom:2px;">Scenario A</div><div style="font-size:13px;font-weight:700;color:#fff;">${valA}</div><div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:1px;">${subA}</div></div>
+            <div><div style="font-size:8px;color:#e8c96a;margin-bottom:2px;">Scenario B</div><div style="font-size:13px;font-weight:700;color:#fff;">${valB}</div><div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:1px;">${subB}</div></div>
+          </div>
+        </div>`;
+      h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+        ${pdfMetric('Loan Amount', f(c.loanAmt), f(cB.loanAmt), c.limitingFactor, cB.limitingFactor)}
+        ${pdfMetric('Monthly Payment', f(c.monthly), f(cB.monthly), 'Interest only', 'Interest only')}
+        ${pdfMetric('Total Fees', f(c.totalFees), f(cB.totalFees), 'At closing', 'At closing')}
+        ${pdfMetric('Cash to Close', f(c.cashToClose), f(cB.cashToClose), 'Required', 'Required')}
+      </div>`;
+    } else {
+      h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+        <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Loan Amount</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.loanAmt)}</div>
+          <div style="font-size:10px;color:#c9a84c;margin-top:2px;">${c.limitingFactor}</div>
+        </div>
+        <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Monthly Payment</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.monthly)}</div>
+          <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Interest only</div>
+        </div>
+        <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Total Fees</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.totalFees)}</div>
+          <div style="font-size:10px;color:#c9a84c;margin-top:2px;">At closing</div>
+        </div>
+        <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Cash to Close</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.cashToClose)}</div>
+          <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Required</div>
+        </div>
+      </div>`;
+    }
   }
 
   if(incTerms){
-    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms &amp; Numbers</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">After Repair Value (ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Budget</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.rehab)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Project Cost</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.tpc)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?d.rate+'% / year':'—'}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.other)}</span></div>
-    </div></div>`;
+    if(compareMode && d.scenarioA && d.scenarioB && cB){
+      const sA=d.scenarioA, sB=d.scenarioB;
+      const pdfRow=(label,valA,valB)=>`
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid #f0ede8;">
+          <span style="font-size:11px;color:#888;">${label}</span>
+          <span style="font-size:11px;font-weight:600;color:#1a3a8f;text-align:right;">${valA}</span>
+          <span style="font-size:11px;font-weight:600;color:#7a4500;text-align:right;">${valB}</span>
+        </div>`;
+      h+=`<div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Property Numbers &amp; Scenario Comparison</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">After Repair Value</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Budget</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.rehab)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Project Cost</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.tpc)}</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:6px 0;border-bottom:2px solid #e2ddd4;margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:700;color:#555;"></span>
+          <span style="font-size:11px;font-weight:700;color:#1a3a8f;text-align:right;">Scenario A</span>
+          <span style="font-size:11px;font-weight:700;color:#7a4500;text-align:right;">Scenario B</span>
+        </div>
+        ${pdfRow('Loan Amount',        f(c.loanAmt),   f(cB.loanAmt))}
+        ${pdfRow('Monthly Payment',    f(c.monthly),   f(cB.monthly))}
+        ${pdfRow('Interest Rate',      sA.rate?sA.rate+'%/yr':'—', sB.rate?sB.rate+'%/yr':'—')}
+        ${pdfRow('Max LTC',            sA.ltc+'%',     sB.ltc+'%')}
+        ${pdfRow('Max LTV',            sA.ltv+'%',     sB.ltv+'%')}
+        ${pdfRow('Origination Fee',    sA.orig?sA.orig+'%':'—', sB.orig?sB.orig+'%':'—')}
+        ${pdfRow('Loan Term',          sA.term+' mo',  sB.term+' mo')}
+        ${pdfRow('Total Fees',         f(c.totalFees), f(cB.totalFees))}
+        ${pdfRow('Cash to Close',      f(c.cashToClose), f(cB.cashToClose))}
+        ${pdfRow('Limiting Factor',    c.limitingFactor, cB.limitingFactor)}
+      </div>`;
+    } else {
+      h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms &amp; Numbers</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">After Repair Value (ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Budget</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.rehab)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Project Cost</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.tpc)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?d.rate+'% / year':'—'}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.other)}</span></div>
+      </div></div>`;
+    }
   }
 
   if(incClosing){
@@ -957,68 +1270,109 @@ function closePDF(){
 
 /* ── EXCEL — LOAN SUMMARY ──────────────────────────────────── */
 function downloadLoanSummaryExcel(){
-  const d = getData(); const c = calcLoan(d);
+  const d = getData();
   const f = n => (n===null||n===undefined||isNaN(n)) ? '—' : Math.round(n);
   const dateStr = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '';
+  const closingStr = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
 
-  const rows = [
+  let rows = [
     ['Asset Lift Lending — Loan Summary'],
     ['Term Sheet Date', dateStr],
     [],
     ['BORROWER & PROPERTY'],
-    ['Borrower Name',        d.borrower  || '—'],
-    ['Property Address',     d.address   || '—'],
-    ['Loan Program',         d.program   || '—'],
-    ['Loan Purpose',         d.purpose   || '—'],
-    ['Estimated Closing',    d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—'],
+    ['Borrower Name',     d.borrower  || '—'],
+    ['Property Address',  d.address   || '—'],
+    ['Loan Program',      d.program   || '—'],
+    ['Loan Purpose',      d.purpose   || '—'],
+    ['Estimated Closing', closingStr],
     [],
     ['PROPERTY NUMBERS'],
-    ['Purchase Price',       f(d.pp)],
-    ['After Repair Value',   f(d.arv)],
-    ['Rehab Budget',         f(d.rehab)],
-    ['Total Project Cost',   f(c.tpc)],
-    [],
-    ['LOAN TERMS'],
-    ['Loan Amount',          f(c.loanAmt)],
-    ['Limiting Factor',      c.limitingFactor],
-    ['Interest Rate (%/yr)', d.rate],
-    ['Monthly Payment',      f(c.monthly)],
-    ['Loan Term (months)',   d.term],
-    ['Origination Fee (%)',  d.orig],
-    ['Origination Fee ($)',  f(c.origFeeAmt)],
-    ['Underwriting Fee',     f(d.uw)],
-    ['Credit Report Fee',    f(d.cr)],
-    ['Other Closing Costs',  f(d.other)],
-    ['Total Fees',           f(c.totalFees)],
-    [],
-    ['LEVERAGE CONTROLS'],
-    ['Max LTV (% of ARV)',   d.ltv],
-    ['Max LTC (% of cost)',  d.ltc],
-    ['Purchase Leverage (%)',d.plev],
-    ['Rehab Leverage (%)',   d.rlev],
-    [],
-    ['CASH TO CLOSE'],
-    ['Purchase Price',       f(d.pp)],
-    ['Less: Purchase Loan',  f(c.purchaseLoan)],
-    ['Plus: Total Fees',     f(c.totalFees)],
-    ['Cash Due at Closing',  f(c.cashToClose)],
-    [],
-    ['RESERVE OPTIONS'],
-    ['Finance Interest Reserves',         d.t1?'Yes':'No'],
-    ['Require Reserves in Bank Account',  d.t2?'Yes':'No'],
-    ['Collect Reserves at Closing',       d.t3?'Yes':'No'],
+    ['Purchase Price',    f(d.pp)],
+    ['After Repair Value',f(d.arv)],
+    ['Rehab Budget',      f(d.rehab)],
   ];
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:30},{wch:22}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Loan Summary');
-  XLSX.writeFile(wb, 'AssetLift_LoanSummary.xlsx');
+  if(compareMode && d.scenarioA && d.scenarioB){
+    const cA = calcLoan({...d,...d.scenarioA}), cB = calcLoan({...d,...d.scenarioB});
+    const sA = d.scenarioA, sB = d.scenarioB;
+    rows = rows.concat([
+      ['Total Project Cost', f(cA.tpc)],
+      [],
+      ['SCENARIO COMPARISON','Scenario A','Scenario B'],
+      ['Loan Amount',         f(cA.loanAmt),     f(cB.loanAmt)],
+      ['Limiting Factor',     cA.limitingFactor, cB.limitingFactor],
+      ['Interest Rate (%/yr)',sA.rate,            sB.rate],
+      ['Monthly Payment',     f(cA.monthly),      f(cB.monthly)],
+      ['Loan Term (months)',  sA.term,             sB.term],
+      ['Origination Fee (%)', sA.orig,             sB.orig],
+      ['Origination Fee ($)', f(cA.origFeeAmt),   f(cB.origFeeAmt)],
+      ['Max LTV (%)',         sA.ltv,              sB.ltv],
+      ['Max LTC (%)',         sA.ltc,              sB.ltc],
+      ['Purchase Leverage (%)',sA.plev,            sB.plev],
+      ['Rehab Leverage (%)',  sA.rlev,             sB.rlev],
+      ['Underwriting Fee',    f(sA.uw),            f(sB.uw)],
+      ['Credit Report Fee',   f(sA.cr),            f(sB.cr)],
+      ['Other Closing Costs', f(sA.other),         f(sB.other)],
+      ['Total Fees',          f(cA.totalFees),    f(cB.totalFees)],
+      ['Cash to Close',       f(cA.cashToClose),  f(cB.cashToClose)],
+      [],
+      ['RESERVE OPTIONS'],
+      ['Finance Interest Reserves',        d.t1?'Yes':'No'],
+      ['Require Reserves in Bank Account', d.t2?'Yes':'No'],
+      ['Collect Reserves at Closing',      d.t3?'Yes':'No'],
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:30},{wch:22},{wch:22}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Loan Summary');
+    XLSX.writeFile(wb, 'AssetLift_LoanSummary.xlsx');
+  } else {
+    const c = calcLoan(d);
+    rows = rows.concat([
+      ['Total Project Cost',   f(c.tpc)],
+      [],
+      ['LOAN TERMS'],
+      ['Loan Amount',          f(c.loanAmt)],
+      ['Limiting Factor',      c.limitingFactor],
+      ['Interest Rate (%/yr)', d.rate],
+      ['Monthly Payment',      f(c.monthly)],
+      ['Loan Term (months)',   d.term],
+      ['Origination Fee (%)',  d.orig],
+      ['Origination Fee ($)',  f(c.origFeeAmt)],
+      ['Underwriting Fee',     f(d.uw)],
+      ['Credit Report Fee',    f(d.cr)],
+      ['Other Closing Costs',  f(d.other)],
+      ['Total Fees',           f(c.totalFees)],
+      [],
+      ['LEVERAGE CONTROLS'],
+      ['Max LTV (% of ARV)',   d.ltv],
+      ['Max LTC (% of cost)',  d.ltc],
+      ['Purchase Leverage (%)',d.plev],
+      ['Rehab Leverage (%)',   d.rlev],
+      [],
+      ['CASH TO CLOSE'],
+      ['Purchase Price',       f(d.pp)],
+      ['Less: Purchase Loan',  f(c.purchaseLoan)],
+      ['Plus: Total Fees',     f(c.totalFees)],
+      ['Cash Due at Closing',  f(c.cashToClose)],
+      [],
+      ['RESERVE OPTIONS'],
+      ['Finance Interest Reserves',         d.t1?'Yes':'No'],
+      ['Require Reserves in Bank Account',  d.t2?'Yes':'No'],
+      ['Collect Reserves at Closing',       d.t3?'Yes':'No'],
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:30},{wch:22}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Loan Summary');
+    XLSX.writeFile(wb, 'AssetLift_LoanSummary.xlsx');
+  }
 }
 
 /* ── EXCEL — AMORTIZATION SCHEDULE ────────────────────────── */
 function downloadAmortizationExcel(){
-  const d = getData(); const c = calcLoan(d);
+  const d = getData();
+  const c = compareMode && d.scenarioA ? calcLoan({...d,...d.scenarioA}) : calcLoan(d);
   const monthly = c.monthly;
   const startDate = d.closing ? new Date(d.closing+'T00:00:00') : new Date();
 
@@ -1054,15 +1408,17 @@ function downloadAmortizationExcel(){
 
 /* ── EMAIL INTRO AUTO-GENERATE ─────────────────────────────── */
 function refreshEmailIntro(){
-  const d = getData(); const c = calcLoan(d);
-  const name    = d.borrower || 'there';
-  const addr    = d.address  || 'the property';
-  const program = d.program  || 'loan';
+  const d = getData();
+  const terms = compareMode && d.scenarioA ? d.scenarioA : d;
+  const c = compareMode && d.scenarioA ? calcLoan({...d,...d.scenarioA}) : calcLoan(d);
+  const name    = d.borrower   || 'there';
+  const addr    = d.address    || 'the property';
+  const program = d.program    || 'loan';
   const loanAmt = c.loanAmt  > 0 ? fmt$(c.loanAmt)  : '[loan amount]';
   const monthly = c.monthly  > 0 ? fmt$(c.monthly)   : '[monthly payment]';
   const fees    = c.totalFees> 0 ? fmt$(c.totalFees) : '[total fees]';
-  const rate    = d.rate     > 0 ? d.rate+'%'        : '[rate]';
-  const term    = d.term         ? d.term+'-month'   : '';
+  const rate    = terms.rate > 0 ? terms.rate+'%'    : '[rate]';
+  const term    = terms.term     ? terms.term+'-month' : '';
   const closing = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '[closing date]';
 
   const intro = `Hi ${name},
