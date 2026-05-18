@@ -425,6 +425,16 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           </div>
           <label class="toggle"><input type="checkbox" id="t1" onchange="updateAll()"><div class="toggle-slider"></div></label>
         </div>
+        <div class="form-row" id="reserveMonthsRow" style="margin-top:14px;display:none;">
+          <div class="form-group">
+            <label>Interest reserve months to finance</label>
+            <input type="number" id="reserveMonths" value="6" min="1" max="24" oninput="updateAll()" />
+          </div>
+          <div class="form-group" style="flex:2;">
+            <label>Reserve amount summary</label>
+            <div class="simple-note" id="reserveSummary" style="margin-bottom:0;">Interest reserve will be calculated from the fully drawn loan payment.</div>
+          </div>
+        </div>
         <div class="toggle-row">
           <div class="toggle-info">
             <strong>Require reserves shown in bank account</strong>
@@ -516,7 +526,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.6;">
       <strong style="color:var(--navy);display:block;margin-bottom:4px;">How this is calculated</strong>
-      Cash to close = Purchase Price + Fees − Loan Amount. The loan amount is capped by the lowest of: (1) purchase leverage × purchase price + rehab leverage × rehab budget, (2) Max LTV × ARV, and (3) Max LTC × total project cost.
+      Cash to close = Purchase Price + Fees − Loan Amount. When the loan is capped, reserves are reduced first, then purchase proceeds, and rehab stays protected as long as possible.
     </div>
   </div>
 
@@ -732,6 +742,10 @@ function fmt$(n){
   return '$'+Math.round(n).toLocaleString('en-US');
 }
 
+function formatLoanLine(label, pct, amount){
+  return `${label} ${pct}% / ${fmt$(amount)}`;
+}
+
 function getData(){
   return {
     borrower: document.getElementById('borrowerName').value,
@@ -754,6 +768,7 @@ function getData(){
     ltc:      parseFloat(document.getElementById('ltcSlider').value),
     plev:     parseFloat(document.getElementById('purchLevSlider').value),
     rlev:     parseFloat(document.getElementById('rehabLevSlider').value),
+    reserveMonths: parseInt(document.getElementById('reserveMonths')?.value)||6,
     t1: document.getElementById('t1').checked,
     t2: document.getElementById('t2').checked,
     t3: document.getElementById('t3').checked,
@@ -765,7 +780,10 @@ function calcLoan(d){
   const tpc            = d.pp + d.rehab;
   const purchaseLoanRaw = d.pp   * (d.plev/100);
   const rehabLoanRaw   = d.rehab * (d.rlev/100);
-  const leverageLoan   = purchaseLoanRaw + rehabLoanRaw;
+  const monthlyPurchaseOnly = purchaseLoanRaw>0 && d.rate>0 ? (purchaseLoanRaw*(d.rate/100))/12 : 0;
+  const monthlyFullyDrawnBase = (purchaseLoanRaw + rehabLoanRaw)>0 && d.rate>0 ? ((purchaseLoanRaw + rehabLoanRaw)*(d.rate/100))/12 : 0;
+  const reserveRequested = d.t1 ? monthlyFullyDrawnBase * d.reserveMonths : 0;
+  const leverageLoan   = purchaseLoanRaw + rehabLoanRaw + reserveRequested;
   const ltvCap  = d.arv > 0 ? d.arv * (d.ltv/100) : Infinity;
   const ltcCap  = tpc   > 0 ? tpc   * (d.ltc/100) : Infinity;
   let loanAmt = leverageLoan;
@@ -773,13 +791,21 @@ function calcLoan(d){
   if(d.arv>0 && ltvCap < loanAmt){ loanAmt = ltvCap; limitingFactor = 'LTV cap'; }
   if(tpc>0  && ltcCap < loanAmt){ loanAmt = ltcCap; limitingFactor = 'LTC cap'; }
   loanAmt = Math.max(0, loanAmt);
-  const purchaseLoan = Math.min(purchaseLoanRaw, loanAmt);
-  const rehabLoan    = Math.max(0, loanAmt - purchaseLoan);
-  const monthly      = loanAmt>0 && d.rate>0 ? (loanAmt*(d.rate/100))/12 : 0;
+  const capReduction = Math.max(0, leverageLoan - loanAmt);
+  const reserveLoan = Math.max(0, reserveRequested - capReduction);
+  const reductionAfterReserve = Math.max(0, capReduction - reserveRequested);
+  const purchaseLoan = Math.max(0, purchaseLoanRaw - reductionAfterReserve);
+  const rehabLoan    = Math.min(rehabLoanRaw, Math.max(0, loanAmt - reserveLoan - purchaseLoan));
+  const monthly      = (purchaseLoan + rehabLoan + reserveLoan)>0 && d.rate>0 ? ((purchaseLoan + rehabLoan + reserveLoan)*(d.rate/100))/12 : 0;
+  const monthlyPurchase = purchaseLoan>0 && d.rate>0 ? (purchaseLoan*(d.rate/100))/12 : 0;
   const origFeeAmt   = loanAmt*(d.orig/100);
   const totalFees    = origFeeAmt + d.uw + d.cr + d.other;
   const cashToClose  = (d.pp - purchaseLoan) + totalFees;
-  return {loanAmt,purchaseLoan,rehabLoan,monthly,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0};
+  return {
+    loanAmt,purchaseLoan,rehabLoan,reserveLoan,monthly,monthlyPurchase,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,
+    purchaseLoanRaw,rehabLoanRaw,reserveRequested,monthlyPurchaseOnly,monthlyFullyDrawnBase,
+    capReduction,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0
+  };
 }
 
 /* ── UPDATE ALL DISPLAYS ───────────────────────────────────── */
@@ -798,6 +824,10 @@ function updateAll(){
   set('heroCash', fmt$(c.cashToClose));
   set('heroLimit', c.limitingFactor);
   set('heroClosing', d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—');
+  if(document.getElementById('reserveMonthsRow')) document.getElementById('reserveMonthsRow').style.display = d.t1 ? 'flex' : 'none';
+  if(document.getElementById('reserveSummary')) document.getElementById('reserveSummary').textContent = d.t1
+    ? `${d.reserveMonths} month reserve request: ${fmt$(c.reserveRequested)}. If capped, reserves are cut first, then purchase proceeds.`
+    : 'Interest reserve will be calculated from the fully drawn loan payment.';
 
   // summary tab fields
   set('sm_borrower', d.borrower); set('sm_program', d.program);
@@ -809,6 +839,11 @@ function updateAll(){
   set('sm_orig', d.orig ? d.orig+'%' : '');
   set('sm_term', d.term ? d.term+' months' : '');
   set('sm_ltv',  d.ltv+'%'); set('sm_ltc', d.ltc+'%');
+  set('sm_purchase_loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+  set('sm_rehab_loan', `${d.rlev}% / ${fmt$(c.rehabLoan)}`);
+  set('sm_reserve_loan', d.t1 ? `${d.reserveMonths} mo / ${fmt$(c.reserveLoan)}` : 'Not financed');
+  set('sm_payment_purchase', fmt$(c.monthlyPurchase));
+  set('sm_payment_full', fmt$(c.monthly));
   set('sm_plev', d.plev+'%');set('sm_rlev',d.rlev+'%');
   set('sm_uw', fmt$(d.uw)); set('sm_cr', fmt$(d.cr));
 
@@ -824,6 +859,8 @@ function updateAll(){
   set('ccr_cr',    fmt$(d.cr));
   set('ccr_other', fmt$(d.other));
   set('ccr_final', fmt$(c.cashToClose));
+  set('ccr_loan_reserve', 'âˆ’ '+fmt$(c.reserveLoan));
+  if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `Payment on purchase only: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.limitingFactor==='LTC cap' ? ' Loan capped by Max LTC; reductions are applied to reserves first, then purchase proceeds.' : ''}`;
 }
 
 /* ── PDF OPTIONS ───────────────────────────────────────────── */
@@ -877,9 +914,9 @@ function buildTermSheetContent(){
         <div style="font-size:10px;color:#c9a84c;margin-top:2px;">${c.limitingFactor}</div>
       </div>
       <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Monthly Payment</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Payment Fully Drawn</div>
         <div style="font-size:15px;font-weight:700;color:#fff;margin-top:3px;">${f(c.monthly)}</div>
-        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Interest only</div>
+        <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Purchase-only: ${f(c.monthlyPurchase)}</div>
       </div>
       <div style="background:#0f1e3c;border-radius:6px;padding:12px;text-align:center;">
         <div style="font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.07em;">Total Fees</div>
@@ -904,6 +941,12 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?d.rate+'% / year':'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Loan</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}% / ${f(c.purchaseLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Loan</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}% / ${f(c.rehabLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Reserves</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.t1 ? d.reserveMonths+' mo / '+f(c.reserveLoan) : 'Not financed'}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment on Purchase</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthlyPurchase)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment Fully Drawn</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthly)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Cap Reason</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${c.limitingFactor}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
@@ -919,11 +962,14 @@ function buildTermSheetContent(){
     <div style="background:#f8f8f5;border:1px solid #e0dbd2;border-radius:6px;padding:12px 14px;">
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:500;">${f(d.pp)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Loan Amount (Purchase)</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.purchaseLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Loan Amount (Rehab)</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.rehabLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Interest Reserves in Loan</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.reserveLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:500;">${f(c.origFeeAmt)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:500;">${f(d.uw)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:500;">${f(d.cr)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #c8c2b6;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:500;">${f(d.other)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:8px 0 4px;"><span style="font-size:13px;font-weight:700;color:#0f1e3c;">Cash Due at Closing</span><span style="font-size:15px;font-weight:700;color:#0f1e3c;">${f(c.cashToClose)}</span></div>
+      <div style="padding-top:8px;font-size:11px;color:#6b6560;">Payment on purchase only: ${f(c.monthlyPurchase)}. Payment once fully drawn: ${f(c.monthly)}. ${c.limitingFactor==='LTC cap' ? 'Loan capped by Max LTC. Reductions are applied to reserves first, then purchase proceeds.' : ''}</div>
     </div></div>`;
   }
 
@@ -932,7 +978,7 @@ function buildTermSheetContent(){
     <div style="display:flex;flex-direction:column;gap:6px;">
       <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ede8;">
         <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t1?'#2d7a4f':'#c8c2b6'};background:${d.t1?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t1?'✓':''}</div>
-        <span style="font-size:12px;font-weight:600;color:#1a1410;">Finance Interest Reserves</span>
+        <span style="font-size:12px;font-weight:600;color:#1a1410;">Finance Interest Reserves ${d.t1 ? '('+d.reserveMonths+' months / '+f(c.reserveLoan)+')' : ''}</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ede8;">
         <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${d.t2?'#2d7a4f':'#c8c2b6'};background:${d.t2?'#2d7a4f':'transparent'};display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:700;">${d.t2?'✓':''}</div>
@@ -1110,7 +1156,8 @@ function buildTermSheetPdfDoc(){
 
   pdf.section('Key Terms');
   pdf.kv('Loan Amount', fmt$(c.loanAmt));
-  pdf.kv('Monthly Payment', fmt$(c.monthly));
+  pdf.kv('Payment on Purchase', fmt$(c.monthlyPurchase));
+  pdf.kv('Payment Fully Drawn', fmt$(c.monthly));
   pdf.kv('Total Fees', fmt$(c.totalFees));
   pdf.kv('Cash To Close', fmt$(c.cashToClose));
   pdf.kv('Limiting Factor', c.limitingFactor);
@@ -1125,6 +1172,9 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Total Project Cost', fmt$(c.tpc));
   pdf.kv('Max LTV', `${d.ltv}%`);
   pdf.kv('Max LTC', `${d.ltc}%`);
+  pdf.kv('Purchase Loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+  pdf.kv('Rehab Loan', `${d.rlev}% / ${fmt$(c.rehabLoan)}`);
+  pdf.kv('Interest Reserves', d.t1 ? `${d.reserveMonths} months / ${fmt$(c.reserveLoan)}` : 'Not financed');
   pdf.kv('Purchase Leverage', `${d.plev}%`);
   pdf.kv('Rehab Leverage', `${d.rlev}%`);
 
@@ -1132,6 +1182,7 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Purchase Price', fmt$(d.pp));
   pdf.kv('Less Purchase Loan', fmt$(c.purchaseLoan));
   pdf.kv('Less Rehab Loan', fmt$(c.rehabLoan));
+  pdf.kv('Less Interest Reserves in Loan', fmt$(c.reserveLoan));
   pdf.kv('Origination Fee', fmt$(c.origFeeAmt));
   pdf.kv('Underwriting Fee', fmt$(d.uw));
   pdf.kv('Credit Report Fee', fmt$(d.cr));
@@ -1139,7 +1190,7 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Cash Due At Closing', fmt$(c.cashToClose));
 
   pdf.section('Notes');
-  pdf.paragraph(document.getElementById('pdfNotes').value || 'This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval.');
+  pdf.paragraph(document.getElementById('pdfNotes').value || `This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval.${c.limitingFactor==='LTC cap' ? ' Loan amount is currently capped by Max LTC, with reductions applied to reserves first and then purchase proceeds.' : ''}`);
 
   return pdf.doc;
 }
@@ -1223,8 +1274,13 @@ function downloadLoanSummaryExcel(){
     ['Loan Amount',          f(c.loanAmt)],
     ['Limiting Factor',      c.limitingFactor],
     ['Interest Rate (%/yr)', d.rate],
-    ['Monthly Payment',      f(c.monthly)],
+    ['Payment on Purchase',  f(c.monthlyPurchase)],
+    ['Payment Fully Drawn',  f(c.monthly)],
     ['Loan Term (months)',   d.term],
+    ['Purchase Loan',        f(c.purchaseLoan)],
+    ['Rehab Loan',           f(c.rehabLoan)],
+    ['Interest Reserves',    f(c.reserveLoan)],
+    ['Reserve Months',       d.t1 ? d.reserveMonths : 0],
     ['Origination Fee (%)',  d.orig],
     ['Origination Fee ($)',  f(c.origFeeAmt)],
     ['Underwriting Fee',     f(d.uw)],
@@ -1301,6 +1357,7 @@ function refreshEmailIntro(){
   const program = d.program  || 'loan';
   const loanAmt = c.loanAmt  > 0 ? fmt$(c.loanAmt)  : '[loan amount]';
   const monthly = c.monthly  > 0 ? fmt$(c.monthly)   : '[monthly payment]';
+  const purchaseMonthly = c.monthlyPurchase > 0 ? fmt$(c.monthlyPurchase) : '[purchase payment]';
   const fees    = c.totalFees> 0 ? fmt$(c.totalFees) : '[total fees]';
   const rate    = d.rate     > 0 ? d.rate+'%'        : '[rate]';
   const term    = d.term         ? d.term+'-month'   : '';
@@ -1314,7 +1371,8 @@ Loan Overview:
   Program:         ${program}
   Loan Amount:     ${loanAmt}
   Interest Rate:   ${rate} per year (interest only)
-  Monthly Payment: ${monthly}
+  Payment on Purchase: ${purchaseMonthly}
+  Payment Fully Drawn: ${monthly}
   Loan Term:       ${term} months
   Closing Date:    ${closing}
   Total Fees:      ${fees}
@@ -1404,6 +1462,7 @@ function showEmailBanner(){
 }
 
 /* ── INIT ──────────────────────────────────────────────────── */
+ensureDerivedFieldUi();
 buildChecklist();
 updateAll();
 
@@ -1412,6 +1471,38 @@ function setSendStatus(message, kind){
   if(!el) return;
   el.textContent = message || '';
   el.className = `send-status${kind ? ` ${kind}` : ''}`;
+}
+
+function ensureDerivedFieldUi(){
+  const summaryGrids = document.querySelectorAll('#tab-summary .pdf-grid');
+  const summaryGrid = summaryGrids[1];
+  if(summaryGrid && !document.getElementById('sm_purchase_loan')){
+    const items = [
+      ['Purchase Loan','sm_purchase_loan'],
+      ['Rehab Loan','sm_rehab_loan'],
+      ['Interest Reserves','sm_reserve_loan'],
+      ['Payment on Purchase','sm_payment_purchase'],
+      ['Payment Fully Drawn','sm_payment_full']
+    ];
+    items.forEach(([label,id]) => {
+      const field = document.createElement('div');
+      field.className = 'pdf-field';
+      field.innerHTML = `<span class="pf-label">${label}</span><span class="pf-val" id="${id}">—</span>`;
+      summaryGrid.appendChild(field);
+    });
+  }
+
+  const cashBreakdown = document.querySelector('#tab-closing .cash-close-breakdown');
+  if(cashBreakdown && !document.getElementById('ccr_loan_reserve')){
+    const reserveRow = document.createElement('div');
+    reserveRow.className = 'cc-row negative';
+    reserveRow.innerHTML = `<span class="cc-r-label">Interest Reserves in Loan</span><span class="cc-r-val" id="ccr_loan_reserve">—</span>`;
+    const note = document.createElement('div');
+    note.id = 'ccr_payment_note';
+    note.style.cssText = 'padding-top:8px;font-size:11px;color:var(--muted);line-height:1.5;';
+    cashBreakdown.insertBefore(reserveRow, document.getElementById('ccr_orig').parentElement);
+    cashBreakdown.appendChild(note);
+  }
 }
 
 async function sendTermsEmail(){
