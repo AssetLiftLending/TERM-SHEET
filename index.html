@@ -102,6 +102,18 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .metric-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center;}
 .metric-card .mc-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
 .metric-card .mc-val{font-size:16px;font-weight:700;color:var(--navy);}
+.sales-hero{background:linear-gradient(135deg,#0f1e3c 0%,#1a2f56 100%);border-radius:14px;padding:18px 20px;margin-bottom:18px;color:#fff;box-shadow:0 14px 30px rgba(15,30,60,0.14);}
+.sales-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;}
+.sales-hero h2{font-family:'Playfair Display',serif;font-size:28px;line-height:1.05;margin-bottom:6px;}
+.sales-hero p{font-size:13px;line-height:1.6;color:rgba(255,255,255,0.78);max-width:540px;}
+.sales-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-light);}
+.sales-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.sales-stat{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;}
+.sales-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.64);margin-bottom:4px;}
+.sales-stat-value{font-size:20px;font-weight:700;color:#fff;}
+.sales-stat-note{font-size:11px;color:var(--gold-light);margin-top:3px;}
+.simple-note{background:#f8f6f2;border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:14px;}
+.simple-note strong{color:var(--navy);}
 
 /* CASH TO CLOSE */
 .cash-close-card{background:var(--navy);border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
@@ -146,6 +158,10 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .send-status{margin-top:12px;font-size:12px;line-height:1.5;color:var(--muted);}
 .send-status.error{color:#b83232;}
 .send-status.success{color:#2d7a4f;}
+@media (max-width:760px){
+  .sales-hero-top{flex-direction:column;}
+  .sales-grid,.metric-row{grid-template-columns:repeat(2,1fr);}
+}
 
 /* PDF PREVIEW MODAL */
 .pdf-modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
@@ -173,11 +189,43 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
     <button class="tab-btn" onclick="switchTab('summary',this)">Summary</button>
     <button class="tab-btn" onclick="switchTab('closing',this)">Cash to Close</button>
     <button class="tab-btn" onclick="switchTab('checklist',this)">Checklist</button>
-    <button class="tab-btn" onclick="switchTab('pdf',this)">Save / Email</button>
+    <button class="tab-btn" onclick="switchTab('pdf',this)">Send</button>
   </div>
 
   <!-- FORM TAB -->
   <div id="tab-form" class="tab-panel active">
+
+    <div class="sales-hero">
+      <div class="sales-hero-top">
+        <div>
+          <div class="sales-pill">Quick Quote</div>
+          <h2>Simple terms that are easy to say yes to.</h2>
+          <p>Fill in the deal, confirm the headline numbers, and send a clean term sheet. Keep the borrower focused on the offer, not the structure.</p>
+        </div>
+      </div>
+      <div class="sales-grid">
+        <div class="sales-stat">
+          <div class="sales-stat-label">Loan Amount</div>
+          <div class="sales-stat-value" id="heroLoanAmt">—</div>
+          <div class="sales-stat-note" id="heroLimit">—</div>
+        </div>
+        <div class="sales-stat">
+          <div class="sales-stat-label">Monthly Payment</div>
+          <div class="sales-stat-value" id="heroMonthly">—</div>
+          <div class="sales-stat-note">Interest only</div>
+        </div>
+        <div class="sales-stat">
+          <div class="sales-stat-label">Cash To Close</div>
+          <div class="sales-stat-value" id="heroCash">—</div>
+          <div class="sales-stat-note">At closing</div>
+        </div>
+        <div class="sales-stat">
+          <div class="sales-stat-label">Closing Target</div>
+          <div class="sales-stat-value" id="heroClosing">—</div>
+          <div class="sales-stat-note">Borrower-facing</div>
+        </div>
+      </div>
+    </div>
 
     <div class="section-card open" id="sec-borrower">
       <div class="section-header" onclick="toggleSection('borrower')">
@@ -266,13 +314,14 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
 
-    <div class="section-card open" id="sec-terms">
+    <div class="section-card" id="sec-terms">
       <div class="section-header" onclick="toggleSection('terms')">
         <div class="section-check" id="chk-terms" onclick="event.stopPropagation();toggleCheck('terms')"></div>
-        <div class="section-title">Loan Terms</div>
+        <div class="section-title">Loan Terms & Advanced Settings</div>
         <div class="section-chevron">▼</div>
       </div>
       <div class="section-body">
+        <div class="simple-note"><strong>Keep this simple:</strong> most borrowers only need loan amount, rate, monthly payment, and cash to close. Open these settings when you need to fine-tune the structure.</div>
         <div class="form-row">
           <div class="form-group">
             <label>Interest rate (% / year)</label>
@@ -362,7 +411,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
 
-    <div class="section-card open" id="sec-reserves">
+    <div class="section-card" id="sec-reserves">
       <div class="section-header" onclick="toggleSection('reserves')">
         <div class="section-check" id="chk-reserves" onclick="event.stopPropagation();toggleCheck('reserves')"></div>
         <div class="section-title">Reserve Options</div>
@@ -744,6 +793,11 @@ function updateAll(){
   document.getElementById('smMonthly').textContent = fmt$(c.monthly);
   document.getElementById('smFees').textContent    = fmt$(c.totalFees);
   document.getElementById('smLimit').textContent   = c.limitingFactor;
+  set('heroLoanAmt', fmt$(c.loanAmt));
+  set('heroMonthly', fmt$(c.monthly));
+  set('heroCash', fmt$(c.cashToClose));
+  set('heroLimit', c.limitingFactor);
+  set('heroClosing', d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—');
 
   // summary tab fields
   set('sm_borrower', d.borrower); set('sm_program', d.program);
