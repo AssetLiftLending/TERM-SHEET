@@ -796,6 +796,9 @@ function calcLoan(d){
   const reductionAfterReserve = Math.max(0, capReduction - reserveRequested);
   const purchaseLoan = Math.max(0, purchaseLoanRaw - reductionAfterReserve);
   const rehabLoan    = Math.min(rehabLoanRaw, Math.max(0, loanAmt - reserveLoan - purchaseLoan));
+  const reserveReduction = Math.max(0, reserveRequested - reserveLoan);
+  const purchaseReduction = Math.max(0, purchaseLoanRaw - purchaseLoan);
+  const rehabReduction = Math.max(0, rehabLoanRaw - rehabLoan);
   const monthly      = (purchaseLoan + rehabLoan + reserveLoan)>0 && d.rate>0 ? ((purchaseLoan + rehabLoan + reserveLoan)*(d.rate/100))/12 : 0;
   const monthlyPurchase = purchaseLoan>0 && d.rate>0 ? (purchaseLoan*(d.rate/100))/12 : 0;
   const origFeeAmt   = loanAmt*(d.orig/100);
@@ -804,7 +807,7 @@ function calcLoan(d){
   return {
     loanAmt,purchaseLoan,rehabLoan,reserveLoan,monthly,monthlyPurchase,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,
     purchaseLoanRaw,rehabLoanRaw,reserveRequested,monthlyPurchaseOnly,monthlyFullyDrawnBase,
-    capReduction,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0
+    capReduction,reserveReduction,purchaseReduction,rehabReduction,ltvCap:isFinite(ltvCap)?ltvCap:0,ltcCap:isFinite(ltcCap)?ltcCap:0
   };
 }
 
@@ -822,11 +825,11 @@ function updateAll(){
   set('heroLoanAmt', fmt$(c.loanAmt));
   set('heroMonthly', fmt$(c.monthly));
   set('heroCash', fmt$(c.cashToClose));
-  set('heroLimit', c.limitingFactor);
+  set('heroLimit', c.capReduction>0 ? `${c.limitingFactor} · Cut ${fmt$(c.capReduction)}` : c.limitingFactor);
   set('heroClosing', d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—');
   if(document.getElementById('reserveMonthsRow')) document.getElementById('reserveMonthsRow').style.display = d.t1 ? 'flex' : 'none';
   if(document.getElementById('reserveSummary')) document.getElementById('reserveSummary').textContent = d.t1
-    ? `${d.reserveMonths} month reserve request: ${fmt$(c.reserveRequested)}. If capped, reserves are cut first, then purchase proceeds.`
+    ? `${d.reserveMonths} month reserve request: ${fmt$(c.reserveRequested)}. ${c.capReduction>0 ? `Reduced by ${fmt$(c.reserveReduction)} from reserves and ${fmt$(c.purchaseReduction)} from purchase.` : 'No cap reduction applied.'}`
     : 'Interest reserve will be calculated from the fully drawn loan payment.';
 
   // summary tab fields
@@ -860,7 +863,7 @@ function updateAll(){
   set('ccr_other', fmt$(d.other));
   set('ccr_final', fmt$(c.cashToClose));
   set('ccr_loan_reserve', 'âˆ’ '+fmt$(c.reserveLoan));
-  if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `Payment on purchase only: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.limitingFactor==='LTC cap' ? ' Loan capped by Max LTC; reductions are applied to reserves first, then purchase proceeds.' : ''}`;
+  if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `Payment on purchase only: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.capReduction>0 ? ` Reduced by ${fmt$(c.reserveReduction)} from reserves, ${fmt$(c.purchaseReduction)} from purchase, and ${fmt$(c.rehabReduction)} from rehab.` : ''}`;
 }
 
 /* ── PDF OPTIONS ───────────────────────────────────────────── */
@@ -947,6 +950,9 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment on Purchase</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthlyPurchase)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment Fully Drawn</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthly)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Cap Reason</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${c.limitingFactor}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Reserve Reduction</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.reserveReduction)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Reduction</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.purchaseReduction)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Reduction</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.rehabReduction)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
@@ -969,7 +975,7 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:500;">${f(d.cr)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #c8c2b6;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:500;">${f(d.other)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:8px 0 4px;"><span style="font-size:13px;font-weight:700;color:#0f1e3c;">Cash Due at Closing</span><span style="font-size:15px;font-weight:700;color:#0f1e3c;">${f(c.cashToClose)}</span></div>
-      <div style="padding-top:8px;font-size:11px;color:#6b6560;">Payment on purchase only: ${f(c.monthlyPurchase)}. Payment once fully drawn: ${f(c.monthly)}. ${c.limitingFactor==='LTC cap' ? 'Loan capped by Max LTC. Reductions are applied to reserves first, then purchase proceeds.' : ''}</div>
+      <div style="padding-top:8px;font-size:11px;color:#6b6560;">Payment on purchase only: ${f(c.monthlyPurchase)}. Payment once fully drawn: ${f(c.monthly)}. ${c.capReduction>0 ? `Reduced by ${f(c.reserveReduction)} from reserves, ${f(c.purchaseReduction)} from purchase, and ${f(c.rehabReduction)} from rehab.` : ''}</div>
     </div></div>`;
   }
 
@@ -1175,6 +1181,9 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Purchase Loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
   pdf.kv('Rehab Loan', `${d.rlev}% / ${fmt$(c.rehabLoan)}`);
   pdf.kv('Interest Reserves', d.t1 ? `${d.reserveMonths} months / ${fmt$(c.reserveLoan)}` : 'Not financed');
+  pdf.kv('Reserve Reduction', fmt$(c.reserveReduction));
+  pdf.kv('Purchase Reduction', fmt$(c.purchaseReduction));
+  pdf.kv('Rehab Reduction', fmt$(c.rehabReduction));
   pdf.kv('Purchase Leverage', `${d.plev}%`);
   pdf.kv('Rehab Leverage', `${d.rlev}%`);
 
