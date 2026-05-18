@@ -112,6 +112,15 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .sales-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.64);margin-bottom:4px;}
 .sales-stat-value{font-size:20px;font-weight:700;color:#fff;}
 .sales-stat-note{font-size:11px;color:var(--gold-light);margin-top:3px;}
+.compare-preview{display:none;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px;}
+.compare-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 10px 26px rgba(15,30,60,0.06);}
+.compare-card.alt{border-color:#c9a84c;background:#fffdf8;}
+.compare-card h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;}
+.compare-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.compare-mini div{background:#f8f6f2;border-radius:8px;padding:10px;}
+.compare-mini span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+.compare-mini strong{font-size:15px;color:var(--navy);}
+.compare-note{margin-top:10px;font-size:11px;line-height:1.5;color:var(--muted);}
 .simple-note{background:#f8f6f2;border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:14px;}
 .simple-note strong{color:var(--navy);}
 
@@ -161,6 +170,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 @media (max-width:760px){
   .sales-hero-top{flex-direction:column;}
   .sales-grid,.metric-row{grid-template-columns:repeat(2,1fr);}
+  .compare-preview{grid-template-columns:1fr;}
 }
 
 /* PDF PREVIEW MODAL */
@@ -224,6 +234,28 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           <div class="sales-stat-value" id="heroClosing">—</div>
           <div class="sales-stat-note">Borrower-facing</div>
         </div>
+      </div>
+    </div>
+
+    <div class="compare-preview" id="comparePreview">
+      <div class="compare-card">
+        <h3>Option A · Current Quote</h3>
+        <div class="compare-mini">
+          <div><span>Loan Amount</span><strong id="cmpALoan">—</strong></div>
+          <div><span>Cash To Close</span><strong id="cmpACash">—</strong></div>
+          <div><span>Purchase Loan</span><strong id="cmpAPurchase">—</strong></div>
+          <div><span>Payment</span><strong id="cmpAPayment">—</strong></div>
+        </div>
+      </div>
+      <div class="compare-card alt">
+        <h3 id="cmpBTitle">Option B · Alternative</h3>
+        <div class="compare-mini">
+          <div><span>Loan Amount</span><strong id="cmpBLoan">—</strong></div>
+          <div><span>Cash To Close</span><strong id="cmpBCash">—</strong></div>
+          <div><span>Purchase Loan</span><strong id="cmpBPurchase">—</strong></div>
+          <div><span>Payment</span><strong id="cmpBPayment">—</strong></div>
+        </div>
+        <div class="compare-note" id="cmpBNote">Alternative leverage option.</div>
       </div>
     </div>
 
@@ -448,6 +480,52 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
             <span>Borrower pays this amount at the closing table</span>
           </div>
           <label class="toggle"><input type="checkbox" id="t3" onchange="updateAll()"><div class="toggle-slider"></div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" id="sec-optionb">
+      <div class="section-header" onclick="toggleSection('optionb')">
+        <div class="section-check" id="chk-optionb" onclick="event.stopPropagation();toggleCheck('optionb')"></div>
+        <div class="section-title">Alternative Option B</div>
+        <div class="section-chevron">â–¼</div>
+      </div>
+      <div class="section-body">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <strong>Show side-by-side alternative</strong>
+            <span>Add a second quote with different leverage so the borrower can compare options.</span>
+          </div>
+          <label class="toggle"><input type="checkbox" id="enableCompare" onchange="updateAll()"><div class="toggle-slider"></div></label>
+        </div>
+        <div id="compareInputs" style="display:none;margin-top:14px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Option B label</label>
+              <input type="text" id="compareLabel" value="Lower Leverage Option" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Option B max LTV (%)</label>
+              <input type="number" id="compareLtv" value="70" min="50" max="95" step="0.5" oninput="updateAll()" />
+            </div>
+            <div class="form-group">
+              <label>Option B max LTC (%)</label>
+              <input type="number" id="compareLtc" value="92.5" min="50" max="100" step="0.5" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Option B purchase leverage (%)</label>
+              <input type="number" id="comparePlev" value="90" min="50" max="100" step="0.5" oninput="updateAll()" />
+            </div>
+            <div class="form-group">
+              <label>Option B rehab leverage (%)</label>
+              <input type="number" id="compareRlev" value="100" min="50" max="100" step="0.5" oninput="updateAll()" />
+            </div>
+          </div>
+          <div class="simple-note"><strong>Test mode:</strong> Option A remains your current quote. Option B is only a comparison layer. If you do not like it, I can remove it and put the screen back to the current single-option flow.</div>
         </div>
       </div>
     </div>
@@ -746,6 +824,17 @@ function formatLoanLine(label, pct, amount){
   return `${label} ${pct}% / ${fmt$(amount)}`;
 }
 
+function getCompareScenario(){
+  return {
+    enabled: !!document.getElementById('enableCompare')?.checked,
+    label: document.getElementById('compareLabel')?.value || 'Alternative Option',
+    ltv: parseFloat(document.getElementById('compareLtv')?.value) || 70,
+    ltc: parseFloat(document.getElementById('compareLtc')?.value) || 92.5,
+    plev: parseFloat(document.getElementById('comparePlev')?.value) || 90,
+    rlev: parseFloat(document.getElementById('compareRlev')?.value) || 100
+  };
+}
+
 function getData(){
   return {
     borrower: document.getElementById('borrowerName').value,
@@ -811,11 +900,26 @@ function calcLoan(d){
   };
 }
 
+function calcCompareLoan(baseData){
+  const compare = getCompareScenario();
+  if(!compare.enabled) return null;
+  const scenario = {
+    ...baseData,
+    ltv: compare.ltv,
+    ltc: compare.ltc,
+    plev: compare.plev,
+    rlev: compare.rlev
+  };
+  return { compare, result: calcLoan(scenario) };
+}
+
 /* ── UPDATE ALL DISPLAYS ───────────────────────────────────── */
 function updateAll(){
   const d = getData();
   const c = calcLoan(d);
   const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = (v||v===0) ? v : '—'; };
+
+  const comparePack = calcCompareLoan(d);
 
   // summary metrics
   document.getElementById('smLoanAmt').textContent = fmt$(c.loanAmt);
@@ -831,6 +935,22 @@ function updateAll(){
   if(document.getElementById('reserveSummary')) document.getElementById('reserveSummary').textContent = d.t1
     ? `${d.reserveMonths} month reserve request: ${fmt$(c.reserveRequested)}. ${c.capReduction>0 ? `Reduced by ${fmt$(c.reserveReduction)} from reserves and ${fmt$(c.purchaseReduction)} from purchase.` : 'No cap reduction applied.'}`
     : 'Interest reserve will be calculated from the fully drawn loan payment.';
+
+  if(document.getElementById('compareInputs')) document.getElementById('compareInputs').style.display = comparePack ? 'block' : 'none';
+  if(document.getElementById('comparePreview')) document.getElementById('comparePreview').style.display = comparePack ? 'grid' : 'none';
+  if(comparePack){
+    const b = comparePack.result;
+    set('cmpALoan', fmt$(c.loanAmt));
+    set('cmpACash', fmt$(c.cashToClose));
+    set('cmpAPurchase', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+    set('cmpAPayment', fmt$(c.monthly));
+    set('cmpBTitle', `Option B Â· ${comparePack.compare.label}`);
+    set('cmpBLoan', fmt$(b.loanAmt));
+    set('cmpBCash', fmt$(b.cashToClose));
+    set('cmpBPurchase', `${comparePack.compare.plev}% / ${fmt$(b.purchaseLoan)}`);
+    set('cmpBPayment', fmt$(b.monthly));
+    set('cmpBNote', `LTV ${comparePack.compare.ltv}% Â· LTC ${comparePack.compare.ltc}% Â· Purchase ${comparePack.compare.plev}% Â· ${b.limitingFactor}`);
+  }
 
   // summary tab fields
   set('sm_borrower', d.borrower); set('sm_program', d.program);
@@ -878,6 +998,7 @@ function togglePdfOpt(name){
 /* ── BUILD TERM SHEET PDF CONTENT ──────────────────────────── */
 function buildTermSheetContent(){
   const d=getData(); const c=calcLoan(d);
+  const comparePack = calcCompareLoan(d);
   const incSummary  = document.getElementById('pdfIncludeSummary').checked;
   const incTerms    = document.getElementById('pdfIncludeTerms').checked;
   const incReserves = document.getElementById('pdfIncludeReserves').checked;
@@ -932,6 +1053,31 @@ function buildTermSheetContent(){
         <div style="font-size:10px;color:#c9a84c;margin-top:2px;">Required</div>
       </div>
     </div>`;
+  }
+
+  if(comparePack){
+    const b = comparePack.result;
+    h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Option Comparison</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="border:1px solid #e2ddd4;border-radius:8px;padding:12px;background:#fafaf8;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#0f1e3c;margin-bottom:8px;">Option A · Current Quote</div>
+        <div style="font-size:12px;line-height:1.8;color:#1a1410;">
+          Loan Amount: <strong>${f(c.loanAmt)}</strong><br>
+          Purchase Loan: <strong>${d.plev}% / ${f(c.purchaseLoan)}</strong><br>
+          Cash to Close: <strong>${f(c.cashToClose)}</strong><br>
+          Payment Fully Drawn: <strong>${f(c.monthly)}</strong>
+        </div>
+      </div>
+      <div style="border:1px solid #c9a84c;border-radius:8px;padding:12px;background:#fffdf8;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#0f1e3c;margin-bottom:8px;">Option B · ${comparePack.compare.label}</div>
+        <div style="font-size:12px;line-height:1.8;color:#1a1410;">
+          Loan Amount: <strong>${f(b.loanAmt)}</strong><br>
+          Purchase Loan: <strong>${comparePack.compare.plev}% / ${f(b.purchaseLoan)}</strong><br>
+          Cash to Close: <strong>${f(b.cashToClose)}</strong><br>
+          Payment Fully Drawn: <strong>${f(b.monthly)}</strong>
+        </div>
+      </div>
+    </div></div>`;
   }
 
   if(incTerms){
@@ -1146,6 +1292,7 @@ function createPdfDoc(title){
 function buildTermSheetPdfDoc(){
   const d = getData();
   const c = calcLoan(d);
+  const comparePack = calcCompareLoan(d);
   const dateStr = d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'N/A';
   const closingStr = d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
   const pdf = createPdfDoc('Loan Term Sheet');
@@ -1170,6 +1317,16 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Interest Rate', d.rate ? `${d.rate}% per year` : '—');
   pdf.kv('Origination Fee', d.orig ? `${d.orig}% (${fmt$(c.origFeeAmt)})` : '—');
   pdf.kv('Loan Term', `${d.term} months`);
+
+  if(comparePack){
+    const b = comparePack.result;
+    pdf.section('Option Comparison');
+    pdf.kv('Option A Loan Amount', fmt$(c.loanAmt));
+    pdf.kv('Option A Purchase Loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+    pdf.kv('Option B Label', comparePack.compare.label);
+    pdf.kv('Option B Loan Amount', fmt$(b.loanAmt));
+    pdf.kv('Option B Purchase Loan', `${comparePack.compare.plev}% / ${fmt$(b.purchaseLoan)}`);
+  }
 
   pdf.section('Project Numbers');
   pdf.kv('Purchase Price', fmt$(d.pp));
