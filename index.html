@@ -243,7 +243,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
         <div class="compare-mini">
           <div><span>Loan Amount</span><strong id="cmpALoan">—</strong></div>
           <div><span>Cash To Close</span><strong id="cmpACash">—</strong></div>
-          <div><span>Purchase Loan</span><strong id="cmpAPurchase">—</strong></div>
+          <div><span id="cmpAPurchaseLabel">Purchase Loan</span><strong id="cmpAPurchase">—</strong></div>
           <div><span>Payment</span><strong id="cmpAPayment">—</strong></div>
         </div>
       </div>
@@ -252,7 +252,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
         <div class="compare-mini">
           <div><span>Loan Amount</span><strong id="cmpBLoan">—</strong></div>
           <div><span>Cash To Close</span><strong id="cmpBCash">—</strong></div>
-          <div><span>Purchase Loan</span><strong id="cmpBPurchase">—</strong></div>
+          <div><span id="cmpBPurchaseLabel">Purchase Loan</span><strong id="cmpBPurchase">—</strong></div>
           <div><span>Payment</span><strong id="cmpBPayment">—</strong></div>
         </div>
         <div class="compare-note" id="cmpBNote">Alternative leverage option.</div>
@@ -294,7 +294,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
               <option value="">— Select —</option>
               <option>Purchase</option>
               <option>Refinance</option>
-              <option>Cash-Out</option>
+              <option>Cash-Out Refinance</option>
               <option>Construction</option>
             </select>
           </div>
@@ -325,7 +325,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       <div class="section-body">
         <div class="form-row">
           <div class="form-group">
-            <label>Purchase price</label>
+            <label id="purchasePriceLabel">Purchase price</label>
             <div class="currency-wrap"><span class="currency-symbol">$</span>
               <input type="number" id="purchasePrice" value="0" min="0" oninput="updateAll()" />
             </div>
@@ -399,7 +399,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
         <div class="slider-row" style="margin-bottom:18px;">
           <div class="slider-group">
             <div class="slider-label-row">
-              <span class="slider-label">Max LTV (% of ARV)</span>
+              <span class="slider-label" id="ltvBaseLabel">Max LTV (% of ARV)</span>
               <div class="slider-val-wrap">
                 <input class="slider-num-input" type="number" id="ltvInput" min="50" max="95" step="0.5" value="70" oninput="syncInputDraft('ltv',this.value)" onblur="syncFromInput('ltv',this.value)" onchange="syncFromInput('ltv',this.value)" />
                 <span class="slider-pct">%</span>
@@ -606,7 +606,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       <div class="section-header"><div class="section-title">Loan Terms &amp; Numbers</div></div>
       <div class="section-body">
         <div class="pdf-grid">
-          <div class="pdf-field"><span class="pf-label">Purchase Price</span><span class="pf-val" id="sm_pp">—</span></div>
+          <div class="pdf-field"><span class="pf-label" id="sm_pp_label">Purchase Price</span><span class="pf-val" id="sm_pp">—</span></div>
           <div class="pdf-field"><span class="pf-label">ARV</span><span class="pf-val" id="sm_arv">—</span></div>
           <div class="pdf-field"><span class="pf-label">Rehab Budget</span><span class="pf-val" id="sm_rehab">—</span></div>
           <div class="pdf-field"><span class="pf-label">Total Project Cost</span><span class="pf-val" id="sm_tpc">—</span></div>
@@ -615,7 +615,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
           <div class="pdf-field"><span class="pf-label">Loan Term</span><span class="pf-val" id="sm_term">—</span></div>
           <div class="pdf-field"><span class="pf-label">Max LTV</span><span class="pf-val" id="sm_ltv">—</span></div>
           <div class="pdf-field"><span class="pf-label">Max LTC</span><span class="pf-val" id="sm_ltc">—</span></div>
-          <div class="pdf-field"><span class="pf-label">Purchase Leverage</span><span class="pf-val" id="sm_plev">—</span></div>
+          <div class="pdf-field"><span class="pf-label" id="sm_plev_label">Purchase Leverage</span><span class="pf-val" id="sm_plev">—</span></div>
           <div class="pdf-field"><span class="pf-label">Rehab Leverage</span><span class="pf-val" id="sm_rlev">—</span></div>
           <div class="pdf-field"><span class="pf-label">UW Fee</span><span class="pf-val" id="sm_uw">—</span></div>
           <div class="pdf-field"><span class="pf-label">Credit Report Fee</span><span class="pf-val" id="sm_cr">—</span></div>
@@ -653,11 +653,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
     <div class="cash-close-breakdown">
-      <div class="cc-row"><span class="cc-r-label">Purchase Price</span><span class="cc-r-val" id="ccr_pp">—</span></div>
+      <div class="cc-row"><span class="cc-r-label" id="ccr_pp_label">Purchase Price</span><span class="cc-r-val" id="ccr_pp">—</span></div>
       <div class="cc-row"><span class="cc-r-label">Rehab Budget</span><span class="cc-r-val" id="ccr_rehab">—</span></div>
       <div class="cc-row" style="font-weight:600;"><span class="cc-r-label" style="font-weight:600;color:var(--text);">Total Project Cost</span><span class="cc-r-val" id="ccr_tpc">—</span></div>
       <div style="height:1px;background:var(--border);margin:8px 0;"></div>
-      <div class="cc-row negative"><span class="cc-r-label">Loan Amount (Purchase)</span><span class="cc-r-val" id="ccr_loan_pp">—</span></div>
+      <div class="cc-row negative"><span class="cc-r-label" id="ccr_loan_pp_label">Loan Amount (Purchase)</span><span class="cc-r-val" id="ccr_loan_pp">—</span></div>
       <div class="cc-row negative"><span class="cc-r-label">Loan Amount (Rehab)</span><span class="cc-r-val" id="ccr_loan_rh">—</span></div>
       <div style="height:1px;background:var(--border);margin:8px 0;"></div>
       <div class="cc-row"><span class="cc-r-label">Origination Fee</span><span class="cc-r-val" id="ccr_orig">—</span></div>
@@ -669,7 +669,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.6;">
       <strong style="color:var(--navy);display:block;margin-bottom:4px;">How this is calculated</strong>
-      Cash to close = Purchase Price + Fees − Loan Amount. When the loan is capped, reserves are reduced first, then purchase proceeds, and rehab stays protected as long as possible.
+      <span id="cc_formula_note">Cash to close = Purchase Price + Fees − Loan Amount. When the loan is capped, reserves are reduced first, then purchase proceeds, and rehab stays protected as long as possible.</span>
     </div>
   </div>
 
@@ -900,12 +900,25 @@ function getCompareScenario(){
   };
 }
 
+function isCashOutRefiDeal(program, purpose){
+  const programText = (program || '').toLowerCase();
+  const purposeText = (purpose || '').toLowerCase();
+  return purposeText.includes('cash-out') || programText.includes('cash-out refinance');
+}
+
 function getData(){
+  const program = document.getElementById('loanProgram').value;
+  const purpose = document.getElementById('loanPurpose').value;
+  const isCashOutRefi = isCashOutRefiDeal(program, purpose);
   return {
     borrower: document.getElementById('borrowerName').value,
     address:  document.getElementById('propAddress').value,
-    program:  document.getElementById('loanProgram').value,
-    purpose:  document.getElementById('loanPurpose').value,
+    program,
+    purpose,
+    isCashOutRefi,
+    valueLabel: isCashOutRefi ? 'As-Is Value' : 'Purchase Price',
+    loanBaseLabel: isCashOutRefi ? 'As-Is Loan' : 'Purchase Loan',
+    leverageLabel: isCashOutRefi ? 'As-Is Leverage' : 'Purchase Leverage',
     closing:  document.getElementById('closingDate').value,
     email:    document.getElementById('borrowerEmail').value,
     phone:    document.getElementById('borrowerPhone').value,
@@ -937,19 +950,21 @@ function getData(){
 }
 
 function calcLoan(d){
-  const tpc            = d.pp + d.rehab;
-  const purchaseLoanRaw = d.pp   * (d.plev/100);
-  const rehabLoanRaw   = d.rehab * (d.rlev/100);
+  const baseValue = d.pp;
+  const tpc = d.isCashOutRefi ? baseValue : d.pp + d.rehab;
+  const purchaseLoanRaw = baseValue * (d.plev/100);
+  const rehabLoanRaw = d.isCashOutRefi ? 0 : d.rehab * (d.rlev/100);
   const monthlyPurchaseOnly = purchaseLoanRaw>0 && d.rate>0 ? (purchaseLoanRaw*(d.rate/100))/12 : 0;
   const monthlyFullyDrawnBase = (purchaseLoanRaw + rehabLoanRaw)>0 && d.rate>0 ? ((purchaseLoanRaw + rehabLoanRaw)*(d.rate/100))/12 : 0;
   const reserveRequested = d.t1 ? monthlyFullyDrawnBase * d.reserveMonths : 0;
   const leverageLoan   = purchaseLoanRaw + rehabLoanRaw + reserveRequested;
-  const ltvCap  = d.arv > 0 ? d.arv * (d.ltv/100) : Infinity;
-  const ltcCap  = tpc   > 0 ? tpc   * (d.ltc/100) : Infinity;
+  const ltvBase = d.isCashOutRefi ? baseValue : d.arv;
+  const ltvCap  = ltvBase > 0 ? ltvBase * (d.ltv/100) : Infinity;
+  const ltcCap  = d.isCashOutRefi ? Infinity : (tpc > 0 ? tpc * (d.ltc/100) : Infinity);
   let loanAmt = leverageLoan;
   let limitingFactor = 'Leverage';
-  if(d.arv>0 && ltvCap < loanAmt){ loanAmt = ltvCap; limitingFactor = 'LTV cap'; }
-  if(tpc>0  && ltcCap < loanAmt){ loanAmt = ltcCap; limitingFactor = 'LTC cap'; }
+  if(ltvBase>0 && ltvCap < loanAmt){ loanAmt = ltvCap; limitingFactor = 'LTV cap'; }
+  if(!d.isCashOutRefi && tpc>0 && ltcCap < loanAmt){ loanAmt = ltcCap; limitingFactor = 'LTC cap'; }
   loanAmt = Math.max(0, loanAmt);
   const capReduction = Math.max(0, leverageLoan - loanAmt);
   const reserveLoan = Math.max(0, reserveRequested - capReduction);
@@ -963,7 +978,7 @@ function calcLoan(d){
   const monthlyPurchase = purchaseLoan>0 && d.rate>0 ? (purchaseLoan*(d.rate/100))/12 : 0;
   const origFeeAmt   = loanAmt*(d.orig/100);
   const totalFees    = origFeeAmt + d.uw + d.cr + d.other;
-  const cashToClose  = (d.pp - purchaseLoan) + totalFees;
+  const cashToClose  = d.isCashOutRefi ? totalFees : (d.pp - purchaseLoan) + totalFees;
   return {
     loanAmt,purchaseLoan,rehabLoan,reserveLoan,monthly,monthlyPurchase,totalFees,origFeeAmt,cashToClose,limitingFactor,tpc,
     purchaseLoanRaw,rehabLoanRaw,reserveRequested,monthlyPurchaseOnly,monthlyFullyDrawnBase,
@@ -989,8 +1004,25 @@ function updateAll(){
   const d = getData();
   const c = calcLoan(d);
   const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = (v||v===0) ? v : '—'; };
+  const setLabel = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = v; };
 
   const comparePack = calcCompareLoan(d);
+  setLabel('purchasePriceLabel', d.valueLabel);
+  setLabel('sm_pp_label', d.valueLabel);
+  setLabel('ccr_pp_label', d.valueLabel);
+  setLabel('sm_plev_label', d.leverageLabel);
+  setLabel('cmpAPurchaseLabel', d.loanBaseLabel);
+  setLabel('cmpBPurchaseLabel', d.loanBaseLabel);
+  setLabel('sm_purchase_loan_label', d.loanBaseLabel);
+  setLabel('sm_payment_purchase_label', d.isCashOutRefi ? 'Payment on As-Is Loan' : 'Payment on Purchase');
+  setLabel('ccr_loan_pp_label', `Loan Amount (${d.isCashOutRefi ? 'As-Is' : 'Purchase'})`);
+  setLabel('ltvBaseLabel', d.isCashOutRefi ? 'Max LTV (% of As-Is Value)' : 'Max LTV (% of ARV)');
+  const formulaNote = document.getElementById('cc_formula_note');
+  if(formulaNote){
+    formulaNote.textContent = d.isCashOutRefi
+      ? 'Cash to close = Fees only. Leverage and LTV are based on the as-is value for cash-out refinance scenarios.'
+      : 'Cash to close = Purchase Price + Fees − Loan Amount. When the loan is capped, reserves are reduced first, then purchase proceeds, and rehab stays protected as long as possible.';
+  }
 
   // summary metrics
   document.getElementById('smLoanAmt').textContent = fmt$(c.loanAmt);
@@ -1020,7 +1052,7 @@ function updateAll(){
     set('cmpBCash', fmt$(b.cashToClose));
     set('cmpBPurchase', `${comparePack.compare.plev}% / ${fmt$(b.purchaseLoan)}`);
     set('cmpBPayment', fmt$(b.monthly));
-    set('cmpBNote', `LTV ${comparePack.compare.ltv}% Â· LTC ${comparePack.compare.ltc}% Â· Purchase ${comparePack.compare.plev}% Â· ${b.limitingFactor}`);
+    set('cmpBNote', `LTV ${comparePack.compare.ltv}% Â· LTC ${comparePack.compare.ltc}% Â· ${d.leverageLabel.replace(' Leverage','')} ${comparePack.compare.plev}% Â· ${b.limitingFactor}`);
   }
 
   // summary tab fields
@@ -1054,12 +1086,12 @@ function updateAll(){
   set('ccr_other', fmt$(d.other));
   set('ccr_final', fmt$(c.cashToClose));
   set('ccr_loan_reserve', 'âˆ’ '+fmt$(c.reserveLoan));
-  if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `Payment on purchase only: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.capReduction>0 ? ` Reduced by ${fmt$(c.reserveReduction)} from reserves, ${fmt$(c.purchaseReduction)} from purchase, and ${fmt$(c.rehabReduction)} from rehab.` : ''}`;
+  if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `${d.isCashOutRefi ? 'Payment on as-is loan' : 'Payment on purchase only'}: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.capReduction>0 ? ` Reduced by ${fmt$(c.reserveReduction)} from reserves, ${fmt$(c.purchaseReduction)} from ${d.isCashOutRefi ? 'as-is loan' : 'purchase'}, and ${fmt$(c.rehabReduction)} from rehab.` : ''}`;
 
   const monthly2    = c.loanAmt>0 && d.rate2>0 ? (c.loanAmt*(d.rate2/100))/12 : 0;
   const origFeeAmt2 = c.loanAmt*(d.orig2/100);
   const totalFees2  = origFeeAmt2 + d.uw2 + d.cr2 + d.other2;
-  const cashToClose2 = (d.pp - c.purchaseLoan) + totalFees2;
+  const cashToClose2 = d.isCashOutRefi ? totalFees2 : (d.pp - c.purchaseLoan) + totalFees2;
   set('sm_rate2',    d.rate2 ? d.rate2+'% / yr' : '');
   set('sm_orig2',    d.orig2 ? d.orig2+'%' : '');
   set('sm_term2',    d.term2 ? d.term2+' months' : '');
@@ -1147,7 +1179,7 @@ function buildTermSheetContent(){
         <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#0f1e3c;margin-bottom:8px;">Option A · Current Quote</div>
         <div style="font-size:12px;line-height:1.8;color:#1a1410;">
           Loan Amount: <strong>${f(c.loanAmt)}</strong><br>
-          Purchase Loan: <strong>${d.plev}% / ${f(c.purchaseLoan)}</strong><br>
+          ${d.loanBaseLabel}: <strong>${d.plev}% / ${f(c.purchaseLoan)}</strong><br>
           Cash to Close: <strong>${f(c.cashToClose)}</strong><br>
           Payment Fully Drawn: <strong>${f(c.monthly)}</strong>
         </div>
@@ -1156,7 +1188,7 @@ function buildTermSheetContent(){
         <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#0f1e3c;margin-bottom:8px;">Option B · ${comparePack.compare.label}</div>
         <div style="font-size:12px;line-height:1.8;color:#1a1410;">
           Loan Amount: <strong>${f(b.loanAmt)}</strong><br>
-          Purchase Loan: <strong>${comparePack.compare.plev}% / ${f(b.purchaseLoan)}</strong><br>
+          ${d.loanBaseLabel}: <strong>${comparePack.compare.plev}% / ${f(b.purchaseLoan)}</strong><br>
           Cash to Close: <strong>${f(b.cashToClose)}</strong><br>
           Payment Fully Drawn: <strong>${f(b.monthly)}</strong>
         </div>
@@ -1167,17 +1199,17 @@ function buildTermSheetContent(){
   if(incTerms){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms &amp; Numbers</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">${d.valueLabel}</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.pp)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">After Repair Value (ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.arv)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Budget</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.rehab)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Total Project Cost</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.tpc)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate?d.rate+'% / year':'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.orig?d.orig+'% ('+f(c.origFeeAmt)+')':'—'}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Loan Term</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.term} months</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Loan</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}% / ${f(c.purchaseLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">${d.loanBaseLabel}</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}% / ${f(c.purchaseLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Loan</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}% / ${f(c.rehabLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Reserves</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.t1 ? d.reserveMonths+' mo / '+f(c.reserveLoan) : 'Not financed'}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment on Purchase</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthlyPurchase)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">${d.isCashOutRefi ? 'Payment on As-Is Loan' : 'Payment on Purchase'}</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthlyPurchase)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Payment Fully Drawn</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.monthly)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Cap Reason</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${c.limitingFactor}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Reserve Reduction</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.reserveReduction)}</span></div>
@@ -1185,7 +1217,7 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Reduction</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(c.rehabReduction)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTV (% of ARV)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltv}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Max LTC (% of total cost)</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.ltc}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Purchase Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">${d.leverageLabel}</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.plev}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Rehab Leverage</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rlev}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Underwriting Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.uw)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${f(d.cr)}</span></div>
@@ -1194,7 +1226,7 @@ function buildTermSheetContent(){
     const monthly2pdf    = c.loanAmt>0 && d.rate2>0 ? (c.loanAmt*(d.rate2/100))/12 : 0;
     const origFeeAmt2pdf = c.loanAmt*(d.orig2/100);
     const totalFees2pdf  = origFeeAmt2pdf + d.uw2 + d.cr2 + d.other2;
-    const cashToClose2pdf = (d.pp - c.purchaseLoan) + totalFees2pdf;
+    const cashToClose2pdf = d.isCashOutRefi ? totalFees2pdf : (d.pp - c.purchaseLoan) + totalFees2pdf;
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Loan Terms — Scenario 2</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;">
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ede8;"><span style="font-size:12px;color:#888;">Interest Rate</span><span style="font-size:12px;font-weight:600;color:#0f1e3c;">${d.rate2?d.rate2+'% / year':'—'}</span></div>
@@ -1211,8 +1243,8 @@ function buildTermSheetContent(){
   if(incClosing){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Cash to Close Breakdown</div>
     <div style="background:#f8f8f5;border:1px solid #e0dbd2;border-radius:6px;padding:12px 14px;">
-      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Purchase Price</span><span style="font-size:12px;font-weight:500;">${f(d.pp)}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Loan Amount (Purchase)</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.purchaseLoan)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">${d.valueLabel}</span><span style="font-size:12px;font-weight:500;">${f(d.pp)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Loan Amount (${d.isCashOutRefi ? 'As-Is' : 'Purchase'})</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.purchaseLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Loan Amount (Rehab)</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.rehabLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Interest Reserves in Loan</span><span style="font-size:12px;font-weight:500;color:#2d7a4f;">− ${f(c.reserveLoan)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Origination Fee</span><span style="font-size:12px;font-weight:500;">${f(c.origFeeAmt)}</span></div>
@@ -1220,7 +1252,7 @@ function buildTermSheetContent(){
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ede8e0;"><span style="font-size:12px;color:#888;">Credit Report Fee</span><span style="font-size:12px;font-weight:500;">${f(d.cr)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #c8c2b6;"><span style="font-size:12px;color:#888;">Other Closing Costs</span><span style="font-size:12px;font-weight:500;">${f(d.other)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:8px 0 4px;"><span style="font-size:13px;font-weight:700;color:#0f1e3c;">Cash Due at Closing</span><span style="font-size:15px;font-weight:700;color:#0f1e3c;">${f(c.cashToClose)}</span></div>
-      <div style="padding-top:8px;font-size:11px;color:#6b6560;">Payment on purchase only: ${f(c.monthlyPurchase)}. Payment once fully drawn: ${f(c.monthly)}. ${c.capReduction>0 ? `Reduced by ${f(c.reserveReduction)} from reserves, ${f(c.purchaseReduction)} from purchase, and ${f(c.rehabReduction)} from rehab.` : ''}</div>
+      <div style="padding-top:8px;font-size:11px;color:#6b6560;">${d.isCashOutRefi ? 'Payment on as-is loan' : 'Payment on purchase only'}: ${f(c.monthlyPurchase)}. Payment once fully drawn: ${f(c.monthly)}. ${c.capReduction>0 ? `Reduced by ${f(c.reserveReduction)} from reserves, ${f(c.purchaseReduction)} from ${d.isCashOutRefi ? 'as-is loan' : 'purchase'}, and ${f(c.rehabReduction)} from rehab.` : ''}</div>
     </div></div>`;
   }
 
@@ -1408,7 +1440,7 @@ function buildTermSheetPdfDoc(){
 
   pdf.section('Key Terms');
   pdf.kv('Loan Amount', fmt$(c.loanAmt));
-  pdf.kv('Payment on Purchase', fmt$(c.monthlyPurchase));
+  pdf.kv(d.isCashOutRefi ? 'Payment on As-Is Loan' : 'Payment on Purchase', fmt$(c.monthlyPurchase));
   pdf.kv('Payment Fully Drawn', fmt$(c.monthly));
   pdf.kv('Total Fees', fmt$(c.totalFees));
   pdf.kv('Cash To Close', fmt$(c.cashToClose));
@@ -1421,31 +1453,31 @@ function buildTermSheetPdfDoc(){
     const b = comparePack.result;
     pdf.section('Option Comparison');
     pdf.kv('Option A Loan Amount', fmt$(c.loanAmt));
-    pdf.kv('Option A Purchase Loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+    pdf.kv(`Option A ${d.loanBaseLabel}`, `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
     pdf.kv('Option B Label', comparePack.compare.label);
     pdf.kv('Option B Loan Amount', fmt$(b.loanAmt));
-    pdf.kv('Option B Purchase Loan', `${comparePack.compare.plev}% / ${fmt$(b.purchaseLoan)}`);
+    pdf.kv(`Option B ${d.loanBaseLabel}`, `${comparePack.compare.plev}% / ${fmt$(b.purchaseLoan)}`);
   }
 
   pdf.section('Project Numbers');
-  pdf.kv('Purchase Price', fmt$(d.pp));
+  pdf.kv(d.valueLabel, fmt$(d.pp));
   pdf.kv('After Repair Value', fmt$(d.arv));
   pdf.kv('Rehab Budget', fmt$(d.rehab));
   pdf.kv('Total Project Cost', fmt$(c.tpc));
   pdf.kv('Max LTV', `${d.ltv}%`);
   pdf.kv('Max LTC', `${d.ltc}%`);
-  pdf.kv('Purchase Loan', `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
+  pdf.kv(d.loanBaseLabel, `${d.plev}% / ${fmt$(c.purchaseLoan)}`);
   pdf.kv('Rehab Loan', `${d.rlev}% / ${fmt$(c.rehabLoan)}`);
   pdf.kv('Interest Reserves', d.t1 ? `${d.reserveMonths} months / ${fmt$(c.reserveLoan)}` : 'Not financed');
   pdf.kv('Reserve Reduction', fmt$(c.reserveReduction));
-  pdf.kv('Purchase Reduction', fmt$(c.purchaseReduction));
+  pdf.kv(`${d.isCashOutRefi ? 'As-Is' : 'Purchase'} Reduction`, fmt$(c.purchaseReduction));
   pdf.kv('Rehab Reduction', fmt$(c.rehabReduction));
-  pdf.kv('Purchase Leverage', `${d.plev}%`);
+  pdf.kv(d.leverageLabel, `${d.plev}%`);
   pdf.kv('Rehab Leverage', `${d.rlev}%`);
 
   pdf.section('Cash To Close Breakdown');
-  pdf.kv('Purchase Price', fmt$(d.pp));
-  pdf.kv('Less Purchase Loan', fmt$(c.purchaseLoan));
+  pdf.kv(d.valueLabel, fmt$(d.pp));
+  pdf.kv(`Less ${d.loanBaseLabel}`, fmt$(c.purchaseLoan));
   pdf.kv('Less Rehab Loan', fmt$(c.rehabLoan));
   pdf.kv('Less Interest Reserves in Loan', fmt$(c.reserveLoan));
   pdf.kv('Origination Fee', fmt$(c.origFeeAmt));
@@ -1530,7 +1562,7 @@ function downloadLoanSummaryExcel(){
     ['Estimated Closing',    d.closing ? new Date(d.closing+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—'],
     [],
     ['PROPERTY NUMBERS'],
-    ['Purchase Price',       f(d.pp)],
+    [d.valueLabel,           f(d.pp)],
     ['After Repair Value',   f(d.arv)],
     ['Rehab Budget',         f(d.rehab)],
     ['Total Project Cost',   f(c.tpc)],
@@ -1539,10 +1571,10 @@ function downloadLoanSummaryExcel(){
     ['Loan Amount',          f(c.loanAmt)],
     ['Limiting Factor',      c.limitingFactor],
     ['Interest Rate (%/yr)', d.rate],
-    ['Payment on Purchase',  f(c.monthlyPurchase)],
+    [d.isCashOutRefi ? 'Payment on As-Is Loan' : 'Payment on Purchase', f(c.monthlyPurchase)],
     ['Payment Fully Drawn',  f(c.monthly)],
     ['Loan Term (months)',   d.term],
-    ['Purchase Loan',        f(c.purchaseLoan)],
+    [d.loanBaseLabel,        f(c.purchaseLoan)],
     ['Rehab Loan',           f(c.rehabLoan)],
     ['Interest Reserves',    f(c.reserveLoan)],
     ['Reserve Months',       d.t1 ? d.reserveMonths : 0],
@@ -1554,14 +1586,14 @@ function downloadLoanSummaryExcel(){
     ['Total Fees',           f(c.totalFees)],
     [],
     ['LEVERAGE CONTROLS'],
-    ['Max LTV (% of ARV)',   d.ltv],
+    [d.isCashOutRefi ? 'Max LTV (% of As-Is Value)' : 'Max LTV (% of ARV)', d.ltv],
     ['Max LTC (% of cost)',  d.ltc],
-    ['Purchase Leverage (%)',d.plev],
+    [`${d.leverageLabel} (%)`,d.plev],
     ['Rehab Leverage (%)',   d.rlev],
     [],
     ['CASH TO CLOSE'],
-    ['Purchase Price',       f(d.pp)],
-    ['Less: Purchase Loan',  f(c.purchaseLoan)],
+    [d.valueLabel,           f(d.pp)],
+    [`Less: ${d.loanBaseLabel}`, f(c.purchaseLoan)],
     ['Plus: Total Fees',     f(c.totalFees)],
     ['Cash Due at Closing',  f(c.cashToClose)],
     [],
@@ -1622,7 +1654,8 @@ function refreshEmailIntro(){
   const program = d.program  || 'loan';
   const loanAmt = c.loanAmt  > 0 ? fmt$(c.loanAmt)  : '[loan amount]';
   const monthly = c.monthly  > 0 ? fmt$(c.monthly)   : '[monthly payment]';
-  const purchaseMonthly = c.monthlyPurchase > 0 ? fmt$(c.monthlyPurchase) : '[purchase payment]';
+  const purchaseMonthly = c.monthlyPurchase > 0 ? fmt$(c.monthlyPurchase) : (d.isCashOutRefi ? '[as-is loan payment]' : '[purchase payment]');
+  const paymentLabel = d.isCashOutRefi ? 'Payment on As-Is' : 'Payment on Purchase';
   const fees    = c.totalFees> 0 ? fmt$(c.totalFees) : '[total fees]';
   const rate    = d.rate     > 0 ? d.rate+'%'        : '[rate]';
   const term    = d.term         ? d.term+'-month'   : '';
@@ -1636,7 +1669,7 @@ Loan Overview:
   Program:         ${program}
   Loan Amount:     ${loanAmt}
   Interest Rate:   ${rate} per year (interest only)
-  Payment on Purchase: ${purchaseMonthly}
+  ${paymentLabel}: ${purchaseMonthly}
   Payment Fully Drawn: ${monthly}
   Loan Term:       ${term} months
   Closing Date:    ${closing}
@@ -1743,16 +1776,16 @@ function ensureDerivedFieldUi(){
   const summaryGrid = summaryGrids[1];
   if(summaryGrid && !document.getElementById('sm_purchase_loan')){
     const items = [
-      ['Purchase Loan','sm_purchase_loan'],
+      ['Purchase Loan','sm_purchase_loan','sm_purchase_loan_label'],
       ['Rehab Loan','sm_rehab_loan'],
       ['Interest Reserves','sm_reserve_loan'],
-      ['Payment on Purchase','sm_payment_purchase'],
+      ['Payment on Purchase','sm_payment_purchase','sm_payment_purchase_label'],
       ['Payment Fully Drawn','sm_payment_full']
     ];
-    items.forEach(([label,id]) => {
+    items.forEach(([label,id,labelId]) => {
       const field = document.createElement('div');
       field.className = 'pdf-field';
-      field.innerHTML = `<span class="pf-label">${label}</span><span class="pf-val" id="${id}">—</span>`;
+      field.innerHTML = `<span class="pf-label"${labelId ? ` id="${labelId}"` : ''}>${label}</span><span class="pf-val" id="${id}">—</span>`;
       summaryGrid.appendChild(field);
     });
   }
