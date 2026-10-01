@@ -346,7 +346,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
 
-    <div class="section-card" id="sec-terms">
+    <div class="section-card open" id="sec-terms">
       <div class="section-header" onclick="toggleSection('terms')">
         <div class="section-check" id="chk-terms" onclick="event.stopPropagation();toggleCheck('terms')"></div>
         <div class="section-title">Loan Terms & Advanced Settings</div>
@@ -443,7 +443,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
     </div>
 
-    <div class="section-card open" id="sec-terms2">
+    <div class="section-card" id="sec-terms2">
       <div class="section-header" onclick="toggleSection('terms2')">
         <div class="section-check" id="chk-terms2" onclick="event.stopPropagation();toggleCheck('terms2')"></div>
         <div class="section-title">Loan Terms — Scenario 2</div>
@@ -538,7 +538,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       <div class="section-header" onclick="toggleSection('optionb')">
         <div class="section-check" id="chk-optionb" onclick="event.stopPropagation();toggleCheck('optionb')"></div>
         <div class="section-title">Alternative Option B</div>
-        <div class="section-chevron">â–¼</div>
+        <div class="section-chevron">▼</div>
       </div>
       <div class="section-body">
         <div class="toggle-row">
@@ -753,7 +753,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
       </div>
 
       <div class="email-note" style="margin-bottom:14px;">
-        <strong>How to send:</strong> Click "Open Email Client" below — all 4 files will download automatically and your email app will open with the message pre-filled. Open each <code>.html</code> file, click "Save as PDF", then attach all 4 files to the email before hitting send.
+        Enter the borrower email above, then tap "Send Email With PDFs". The term sheet and checklist PDFs are generated and emailed automatically.
       </div>
 
       <button class="btn-primary" id="sendEmailBtn" onclick="sendTermsEmail()" style="width:100%;justify-content:center;">
@@ -1085,7 +1085,7 @@ function updateAll(){
   set('ccr_cr',    fmt$(d.cr));
   set('ccr_other', fmt$(d.other));
   set('ccr_final', fmt$(c.cashToClose));
-  set('ccr_loan_reserve', 'âˆ’ '+fmt$(c.reserveLoan));
+  set('ccr_loan_reserve', '− '+fmt$(c.reserveLoan));
   if(document.getElementById('ccr_payment_note')) document.getElementById('ccr_payment_note').textContent = `${d.isCashOutRefi ? 'Payment on as-is loan' : 'Payment on purchase only'}: ${fmt$(c.monthlyPurchase)}. Payment once fully drawn: ${fmt$(c.monthly)}.${c.capReduction>0 ? ` Reduced by ${fmt$(c.reserveReduction)} from reserves, ${fmt$(c.purchaseReduction)} from ${d.isCashOutRefi ? 'as-is loan' : 'purchase'}, and ${fmt$(c.rehabReduction)} from rehab.` : ''}`;
 
   const monthly2    = c.loanAmt>0 && d.rate2>0 ? (c.loanAmt*(d.rate2/100))/12 : 0;
