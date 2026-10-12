@@ -584,6 +584,9 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 
   <!-- SUMMARY TAB -->
   <div id="tab-summary" class="tab-panel">
+    <div style="margin-bottom:14px;padding:10px 14px;background:#fbf6e6;border:1px solid #e8d7a3;border-left:4px solid #c9a84c;border-radius:8px;font-size:12px;color:#555;line-height:1.5;">
+      <strong style="color:#0f1e3c;text-transform:uppercase;letter-spacing:0.05em;">For Business Purpose Loans Only.</strong> Non-owner-occupied investment property; not for personal, family or household purposes.
+    </div>
     <div class="metric-row">
       <div class="metric-card"><div class="mc-label">Loan Amount</div><div class="mc-val" id="smLoanAmt">—</div></div>
       <div class="metric-card"><div class="mc-label">Monthly Payment</div><div class="mc-val" id="smMonthly">—</div></div>
@@ -906,6 +909,10 @@ function isCashOutRefiDeal(program, purpose){
   return purposeText.includes('cash-out') || programText.includes('cash-out refinance');
 }
 
+/* Every term sheet output carries this. Asset Lift Lending only makes business-purpose loans. */
+const BUSINESS_PURPOSE_TITLE = 'For Business Purpose Loans Only';
+const BUSINESS_PURPOSE_TEXT  = 'This financing is offered for business-purpose loans only, secured by non-owner-occupied investment property. It is not available for personal, family or household purposes or for owner-occupied property.';
+
 function getData(){
   const program = document.getElementById('loanProgram').value;
   const purpose = document.getElementById('loanPurpose').value;
@@ -1134,6 +1141,10 @@ function buildTermSheetContent(){
     <div style="font-size:12px;color:#888;margin-top:3px;">Issued: ${dateStr}</div>
     <div style="font-size:11px;color:#c9a84c;font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;">Confidential</div></div>
   </div>`;
+  h += `<div style="margin:-8px 0 20px;padding:8px 12px;background:#fbf6e6;border:1px solid #e8d7a3;border-left:4px solid #c9a84c;border-radius:6px;">
+    <div style="font-size:12px;font-weight:700;color:#0f1e3c;text-transform:uppercase;letter-spacing:0.06em;">${BUSINESS_PURPOSE_TITLE}</div>
+    <div style="font-size:11px;color:#555;margin-top:2px;line-height:1.5;">${BUSINESS_PURPOSE_TEXT}</div>
+  </div>`;
 
   if(incSummary){
     h+=`<div style="margin-bottom:20px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0f1e3c;background:#f0f3f9;padding:6px 10px;border-left:3px solid #c9a84c;margin-bottom:10px;">Borrower &amp; Property</div>
@@ -1280,7 +1291,7 @@ function buildTermSheetContent(){
   }
 
   h+=`<div style="margin-top:28px;padding-top:12px;border-top:1px solid #e2ddd4;display:flex;justify-content:space-between;align-items:center;">
-    <div style="font-size:10px;color:#aaa;max-width:60%;line-height:1.5;">This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval and may change.</div>
+    <div style="font-size:10px;color:#aaa;max-width:60%;line-height:1.5;">${BUSINESS_PURPOSE_TITLE}. This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval and may change.</div>
     <div style="font-size:10px;color:#aaa;">Asset Lift Lending · Confidential</div>
   </div>`;
   h+='</div>';
@@ -1371,7 +1382,11 @@ function createPdfDoc(title){
     doc.text('Asset Lift Lending', page.margin, 42);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(title, page.width - page.margin, 42, {align:'right'});
+    doc.text(title, page.width - page.margin, 36, {align:'right'});
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(201, 168, 76);
+    doc.text(BUSINESS_PURPOSE_TITLE.toUpperCase(), page.width - page.margin, 52, {align:'right'});
     page.y = 96;
   }
 
@@ -1486,6 +1501,9 @@ function buildTermSheetPdfDoc(){
   pdf.kv('Other Closing Costs', fmt$(d.other));
   pdf.kv('Cash Due At Closing', fmt$(c.cashToClose));
 
+  pdf.section(BUSINESS_PURPOSE_TITLE);
+  pdf.paragraph(BUSINESS_PURPOSE_TEXT);
+
   pdf.section('Notes');
   pdf.paragraph(document.getElementById('pdfNotes').value || `This term sheet is for informational purposes only and does not constitute a commitment to lend. All terms are subject to underwriting approval.${c.limitingFactor==='LTC cap' ? ' Loan amount is currently capped by Max LTC, with reductions applied to reserves first and then purchase proceeds.' : ''}`);
 
@@ -1552,6 +1570,7 @@ function downloadLoanSummaryExcel(){
 
   const rows = [
     ['Asset Lift Lending — Loan Summary'],
+    [BUSINESS_PURPOSE_TITLE],
     ['Term Sheet Date', dateStr],
     [],
     ['BORROWER & PROPERTY'],
@@ -1680,6 +1699,8 @@ Attached you will find:
   • Document Checklist PDF — items needed to proceed
   • Loan Summary (Excel) — all terms and calculated values
   • Payment Schedule (Excel) — month-by-month interest schedule
+
+Please note: ${BUSINESS_PURPOSE_TEXT}
 
 Please review the attached documents and let me know if you have any questions. Once you've had a chance to look everything over, we can schedule a call to go through the details together.
 
